@@ -10,6 +10,9 @@ import { User, Mail, Lock, UserCheck, Store, Shield, ArrowRight } from "lucide-r
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { registerUser } from "@/lib/acrions/registerUser";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const registerSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -23,6 +26,7 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
+    const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
@@ -45,11 +49,15 @@ export default function RegisterForm() {
 
     const onSubmit = async (data: RegisterFormValues) => {
         setIsSubmitting(true);
-        console.log("Register Form Data:", data);
-        // Submit handling / API integration will go here
-        setTimeout(() => {
-            setIsSubmitting(false);
-        }, 1000);
+        // console.log("Register Form Data:", data);
+        const result = await registerUser(data);
+        // console.log(result);
+        if (result.success) {
+            toast.success(result.message);
+            router.push("/")
+        } else toast.error(result.error)
+
+        setIsSubmitting(false);
     };
 
     return (
