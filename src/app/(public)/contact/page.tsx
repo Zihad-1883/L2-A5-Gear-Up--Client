@@ -21,10 +21,8 @@ export default function ContactPage() {
           </p>
         </div>
 
-        {/* Contact Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Contact Information Sidebar */}
           <div className="space-y-6 lg:col-span-1">
             <Card className="bg-slate-900/90 border-slate-800 p-6 space-y-6">
               <h3 className="text-lg font-bold text-white">Contact Info</h3>
@@ -73,7 +71,6 @@ export default function ContactPage() {
             </Card>
           </div>
 
-          {/* Contact Form */}
           <div className="lg:col-span-2">
             <Card className="bg-slate-900/90 border-slate-800 p-6 sm:p-8">
               <CardHeader className="px-0 pt-0">

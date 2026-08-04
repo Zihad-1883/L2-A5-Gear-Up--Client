@@ -1,4 +1,7 @@
+"use server";
+
 import { TLoginUser, TRegisterUser } from "@/app/types/userAuthData.type";
+import { cookies } from "next/headers";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_API;
 
@@ -23,5 +26,14 @@ export const loginUser = async (data: TLoginUser) => {
         body: JSON.stringify(data),
     });
     const result = await res.json();
+
+    if (result?.success && result?.data?.accessToken) {
+        const cookieStore = await cookies();
+        cookieStore.set("accessToken", result.data.accessToken);
+        if (result?.data?.refreshToken) {
+            cookieStore.set("refreshToken", result.data.refreshToken);
+        }
+    }
+
     return result;
 }

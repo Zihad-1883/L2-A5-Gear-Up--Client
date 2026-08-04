@@ -88,12 +88,12 @@ export default function Navbar() {
 
                         <div className="pt-2 flex flex-col gap-2">
                             <Button asChild variant="outline" size="sm" className="w-full">
-                                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                                <Link href="/login" onClick={() => setIsOpen(false)}>
                                     Login
                                 </Link>
                             </Button>
                             <Button asChild variant="default" size="sm" className="w-full">
-                                <Link href="/auth/register" onClick={() => setIsOpen(false)}>
+                                <Link href="/register" onClick={() => setIsOpen(false)}>
                                     Register
                                 </Link>
                             </Button>

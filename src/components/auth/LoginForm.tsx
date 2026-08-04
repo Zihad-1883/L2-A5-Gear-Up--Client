@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Shield, ArrowRight } from "lucide-react";
+import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginForm() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
@@ -89,10 +90,22 @@ export default function LoginForm() {
                             <Lock className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
                             <Input
                                 {...register("password")}
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
-                                className="pl-10"
+                                className="pl-10 pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
                         </div>
                         {errors.password && (
                             <p className="text-xs text-rose-400">{errors.password.message}</p>
