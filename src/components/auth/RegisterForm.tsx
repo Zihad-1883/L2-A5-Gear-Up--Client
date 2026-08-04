@@ -10,9 +10,10 @@ import { User, Mail, Lock, UserCheck, Store, Shield, ArrowRight } from "lucide-r
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { registerUser } from "@/lib/acrions/registerUser";
+
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { registerUser } from "@/lib/acrions/userAuth";
 
 const registerSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -54,8 +55,10 @@ export default function RegisterForm() {
         // console.log(result);
         if (result.success) {
             toast.success(result.message);
-            router.push("/")
-        } else toast.error(result.error)
+            router.push("/");
+        } else {
+            toast.error(result.message || result.error || "Registration failed");
+        }
 
         setIsSubmitting(false);
     };

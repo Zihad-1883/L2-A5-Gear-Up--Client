@@ -10,6 +10,10 @@ import { Mail, Lock, Shield, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { loginUser } from "@/lib/acrions/userAuth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 
 const loginSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -19,6 +23,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+    const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
@@ -35,11 +40,14 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         setIsSubmitting(true);
-        console.log("Login Form Data:", data);
-        // Submit handling / API integration will go here
-        setTimeout(() => {
-            setIsSubmitting(false);
-        }, 1000);
+        // console.log("Login Form Data:", data);
+        const res = await loginUser(data);
+        // console.log(res);
+        if (res.success) {
+            toast.success(res.message);
+            router.push("/");
+        } else toast.error(res.message);
+        setIsSubmitting(false);
     };
 
     return (
@@ -101,7 +109,7 @@ export default function LoginForm() {
                         size="lg"
                         className="w-full"
                     >
-                        {isSubmitting ? "Signing In..." : "Sign In"}
+                        {isSubmitting ? "Logging In..." : "Login"}
                         <ArrowRight className="h-4 w-4" />
                     </Button>
 
