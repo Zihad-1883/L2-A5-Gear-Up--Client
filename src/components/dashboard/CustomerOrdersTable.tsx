@@ -51,13 +51,32 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
         }
     };
 
+    const findUrlInObject = (obj: unknown): string | null => {
+        if (!obj) return null;
+        if (typeof obj === "string" && (obj.startsWith("http://") || obj.startsWith("https://"))) {
+            return obj;
+        }
+        if (typeof obj === "object" && obj !== null) {
+            const record = obj as Record<string, unknown>;
+            for (const key of Object.keys(record)) {
+                if (key.startsWith("_")) continue;
+                const found = findUrlInObject(record[key]);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
     const handlePayNow = async (orderId: string) => {
         setLoadingId(orderId);
         try {
             const res = await createPaymentSession(orderId);
-            const targetUrl = res?.data?.paymentUrl || res?.paymentUrl;
+            console.log("Payment session response:", res);
+
+            const targetUrl = findUrlInObject(res);
+
             if (res?.success && targetUrl) {
-                toast.success("Redirecting to payment gateway...");
+                toast.success("Redirecting to SSLCommerz payment gateway...");
                 window.location.assign(targetUrl);
             } else {
                 toast.error(res?.message || "Failed to initiate payment session.");

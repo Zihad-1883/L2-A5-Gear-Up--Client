@@ -249,7 +249,7 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                                     <Button
                                                         onClick={() => handleStatusChange(orderId, "PICKED_UP")}
                                                         size="sm"
-                                                        className="bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-xs"
+                                                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md border border-blue-400/30"
                                                     >
                                                         <Truck className="h-3.5 w-3.5 mr-1" />
                                                         Mark Picked Up
@@ -260,7 +260,7 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                                     <Button
                                                         onClick={() => handleStatusChange(orderId, "RETURNED")}
                                                         size="sm"
-                                                        className="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs"
+                                                        className="bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-md border border-teal-400/30"
                                                     >
                                                         <RotateCcw className="h-3.5 w-3.5 mr-1" />
                                                         Mark Returned

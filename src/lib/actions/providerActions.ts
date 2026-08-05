@@ -96,6 +96,27 @@ export const getProviderOrders = async () => {
     }
 };
 
+export const getProviderGears = async () => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("accessToken")?.value;
+
+        const res = await fetch(`${baseUrl}/provider/gear`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}`, cookie: `accessToken=${token}` } : {}),
+            },
+            cache: "no-store",
+        });
+        const result = await res.json();
+        return result;
+    } catch (error) {
+        console.error("Error fetching provider gears:", error);
+        return { success: false, data: [] };
+    }
+};
+
 export const updateOrderStatus = async (rentalOrderId: string, status: TRentalStatus) => {
     try {
         const cookieStore = await cookies();
