@@ -23,7 +23,9 @@ export const createReview = async (reviewData: TReview) => {
         const data = await res.json();
         console.log("Create Review API Response:", data);
 
-        revalidatePath(`/gear/${reviewData.gearItemId}`);
+        if (reviewData.gearItemId || reviewData.gearId) {
+            revalidatePath(`/gear/${reviewData.gearItemId || reviewData.gearId}`);
+        }
         return data;
     } catch (error) {
         console.error("Error creating review:", error);
