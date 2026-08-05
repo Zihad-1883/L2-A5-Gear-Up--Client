@@ -37,3 +37,9 @@ export const loginUser = async (data: TLoginUser) => {
 
     return result;
 }
+
+export const logoutUser = async () => {
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("refreshToken");
+}

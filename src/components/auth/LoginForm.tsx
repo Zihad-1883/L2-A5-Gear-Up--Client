@@ -11,7 +11,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { loginUser } from "@/lib/acrions/userAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 
@@ -24,6 +24,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get("redirect");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -41,12 +43,10 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         setIsSubmitting(true);
-        // console.log("Login Form Data:", data);
         const res = await loginUser(data);
-        // console.log(res);
         if (res.success) {
             toast.success(res.message);
-            router.push("/");
+            router.push(redirectPath || "/");
         } else toast.error(res.message);
         setIsSubmitting(false);
     };

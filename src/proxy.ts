@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken } from './utilis/jwt';
+
 import { createNewAccessToken } from './utilis/accessToken';
+import { verifyToken } from './utilis/jwt';
 
 const AUTH_ROUTES = ["/login", "/register"];
 const PUBLIC_ROUTES = ["/", "/about", "/contact"];
@@ -11,22 +12,18 @@ const CUSTOMER_ROUTES = ["/dashboard/customer"];
 const PROVIDER_ROUTES = ["/dashboard/provider"];
 
 export async function proxy(request: NextRequest) {
-    const pathName = request.nextUrl.pathname
+    const pathName = request.nextUrl.pathname;
     const cookieStore = await cookies();
 
     let accessToken = cookieStore.get("accessToken")?.value;
     const refreshToken = cookieStore.get("refreshToken")?.value;
 
-    let verifiedAccessToken = verifyToken(accessToken as string, process.env.JWT_ACCESS_SECRET as string) || null;
-    const verifiedRefreshToken = verifyToken(refreshToken as string, process.env.JWT_REFRESH_SECRET as string) || null;
+    let verifiedAccessToken = accessToken ? verifyToken(accessToken, process.env.JWT_ACCESS_SECRET) : null;
+    const verifiedRefreshToken = refreshToken ? verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET) : null;
 
-    if (!verifiedAccessToken && !verifiedRefreshToken) {
-        return NextResponse.redirect(new URL('/login', request.url))
-    }
-
-    if (!verifiedAccessToken && verifiedRefreshToken) {
+    if ((!verifiedAccessToken || !verifiedAccessToken.success) && verifiedRefreshToken?.success) {
         const result = await createNewAccessToken();
-        if (result.success) {
+        if (result?.success && result?.data?.accessToken) {
             const newAccessToken = result.data.accessToken;
             cookieStore.set("accessToken", newAccessToken, {
                 httpOnly: true,
@@ -35,22 +32,31 @@ export async function proxy(request: NextRequest) {
             });
 
             accessToken = newAccessToken;
-            verifiedAccessToken = verifyToken(accessToken as string, process.env.JWT_ACCESS_SECRET as string);
+            verifiedAccessToken = verifyToken(accessToken, process.env.JWT_ACCESS_SECRET);
         }
     }
 
-    if (!verifiedAccessToken.success) {
-        cookieStore.delete("accessToken")
+    if (accessToken && verifiedAccessToken && !verifiedAccessToken.success) {
+        cookieStore.delete("accessToken");
     }
 
-    let userRole = null;
-
+    let userRole: string | null = null;
     if (verifiedAccessToken?.success && verifiedAccessToken.data) {
         userRole = verifiedAccessToken.data.role;
     }
 
+    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
+    const isAuthRoute = AUTH_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
+    const isAdminRoute = ADMIN_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
+    const isCustomerRoute = CUSTOMER_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
+    const isProviderRoute = PROVIDER_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
 
-    if (accessToken && AUTH_ROUTES.includes(pathName)) {
+    if (verifiedAccessToken?.success && isAuthRoute) {
+        const redirectUrl = request.nextUrl.searchParams.get("redirect");
+        if (redirectUrl) {
+            return NextResponse.redirect(new URL(redirectUrl, request.url));
+        }
+
         if (userRole === "CUSTOMER") {
             return NextResponse.redirect(new URL("/dashboard/customer", request.url));
         } else if (userRole === "PROVIDER") {
@@ -60,32 +66,25 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
-    const isAuthRoute = AUTH_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
-    const isAdminRoute = ADMIN_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
-    const isCustomerRoute = CUSTOMER_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
-    const isProviderRoute = PROVIDER_ROUTES.some((route) => pathName === route || pathName.startsWith(route + "/"));
-
-    if (!accessToken || !isPublicRoute || !isAuthRoute) {
+    if (!verifiedAccessToken?.success && !isPublicRoute && !isAuthRoute) {
         const loginUrl = new URL("/login", request.url);
         loginUrl.searchParams.set("redirect", pathName);
         return NextResponse.redirect(loginUrl);
     }
 
-    if (accessToken && !isCustomerRoute && userRole === "CUSTOMER") {
-        return NextResponse.redirect(new URL("/dashboard/customer", request.url));
+    if (verifiedAccessToken?.success) {
+        if (userRole === "CUSTOMER" && (isAdminRoute || isProviderRoute)) {
+            return NextResponse.redirect(new URL("/dashboard/customer", request.url));
+        }
+        if (userRole === "PROVIDER" && (isAdminRoute || isCustomerRoute)) {
+            return NextResponse.redirect(new URL("/dashboard/provider", request.url));
+        }
+        if (userRole === "ADMIN" && (isCustomerRoute || isProviderRoute)) {
+            return NextResponse.redirect(new URL("/dashboard/admin", request.url));
+        }
     }
 
-    if (accessToken && !isProviderRoute && userRole === "PROVIDER") {
-        return NextResponse.redirect(new URL("/dashboard/provider", request.url));
-    }
-
-    if (accessToken && !isAdminRoute && userRole === "ADMIN") {
-        return NextResponse.redirect(new URL("/dashboard/admin", request.url));
-    }
-
-
-
+    return NextResponse.next();
 }
 
 export const config = {

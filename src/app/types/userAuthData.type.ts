@@ -9,3 +9,10 @@ export type TLoginUser = {
     email: string;
     password: string;
 }
+
+export type TUser = {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+}
