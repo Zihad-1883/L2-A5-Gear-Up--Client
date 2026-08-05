@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/lib/acrions/userAuth";
+import { registerUser } from "@/lib/actions/userAuth";
 
 const registerSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),

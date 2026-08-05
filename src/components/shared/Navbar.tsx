@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Shield, Menu, X, User, ChevronDown, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TUser } from "@/app/types/userAuthData.type";
-import { logoutUser } from "@/lib/acrions/userAuth";
+
 import { useRouter } from "next/navigation";
+import { logoutUser } from "@/lib/actions/userAuth";
 
 export default function Navbar({ user }: { user: TUser | null }) {
     const [isOpen, setIsOpen] = useState(false);

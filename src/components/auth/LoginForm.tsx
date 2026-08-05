@@ -10,7 +10,7 @@ import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { loginUser } from "@/lib/acrions/userAuth";
+import { loginUser } from "@/lib/actions/userAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
