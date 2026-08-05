@@ -4,8 +4,7 @@ export default function AboutSection() {
     return (
         <section className="relative bg-slate-900/60 py-20 border-y border-slate-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                
-                {/* Section Header */}
+
                 <div className="mx-auto max-w-3xl text-center">
                     <h2 className="text-xs font-semibold uppercase tracking-wider text-teal-400">
                         About GearUp
@@ -18,9 +17,8 @@ export default function AboutSection() {
                     </p>
                 </div>
 
-                {/* Core Pillars Grid */}
                 <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                    
+
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl backdrop-blur-md transition-all hover:border-teal-500/40 hover:-translate-y-1">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
                             <Zap className="h-6 w-6" />

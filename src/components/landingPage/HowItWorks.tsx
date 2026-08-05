@@ -31,8 +31,7 @@ export default function HowItWorks() {
     return (
         <section className="bg-slate-950 py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                
-                {/* Section Header */}
+
                 <div className="text-center">
                     <h2 className="text-xs font-semibold uppercase tracking-wider text-teal-400">
                         Simple Step-by-Step
@@ -45,7 +44,6 @@ export default function HowItWorks() {
                     </p>
                 </div>
 
-                {/* Steps Grid */}
                 <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 relative">
                     {steps.map((step, idx) => {
                         const Icon = step.icon;

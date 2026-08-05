@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function CTASection() {
     return (
         <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 to-slate-900 py-24 border-t border-slate-800">
+
             <div className="pointer-events-none absolute bottom-0 left-1/2 -z-10 h-[350px] w-[500px] -translate-x-1/2 rounded-full bg-teal-500/15 blur-[140px]" />
 
             <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
