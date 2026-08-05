@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff, Sparkles, User, Store } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { loginUser } from "@/lib/actions/userAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-
 
 const loginSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -32,6 +31,7 @@ export default function LoginForm() {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -44,11 +44,19 @@ export default function LoginForm() {
     const onSubmit = async (data: LoginFormValues) => {
         setIsSubmitting(true);
         const res = await loginUser(data);
-        if (res.success) {
-            toast.success(res.message);
+        if (res?.success) {
+            toast.success(res?.message || "Logged in successfully!");
             router.push(redirectPath || "/");
-        } else toast.error(res.message);
+        } else {
+            toast.error(res?.message || "Login failed. Please check your credentials.");
+        }
         setIsSubmitting(false);
+    };
+
+    const handleDemoFill = (email: string, pass: string) => {
+        setValue("email", email, { shouldValidate: true });
+        setValue("password", pass, { shouldValidate: true });
+        toast.info(`Filled credentials for ${email}`);
     };
 
     return (
@@ -65,6 +73,41 @@ export default function LoginForm() {
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <CardContent className="space-y-4">
+                    {/* Demo Login Shortcuts */}
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 space-y-2">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-teal-400">
+                            <Sparkles className="h-3.5 w-3.5" />
+                            <span>Quick Demo Accounts:</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                type="button"
+                                onClick={() => handleDemoFill("arif.customer@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-teal-500/50 hover:bg-slate-800 hover:text-teal-300 transition-all active:scale-[0.97]"
+                            >
+                                <User className="h-3.5 w-3.5 text-teal-400 mb-1" />
+                                <span>Customer</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => handleDemoFill("summit.provider@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-emerald-500/50 hover:bg-slate-800 hover:text-emerald-300 transition-all active:scale-[0.97]"
+                            >
+                                <Store className="h-3.5 w-3.5 text-emerald-400 mb-1" />
+                                <span>Provider</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => handleDemoFill("admin@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-purple-500/50 hover:bg-slate-800 hover:text-purple-300 transition-all active:scale-[0.97]"
+                            >
+                                <Shield className="h-3.5 w-3.5 text-purple-400 mb-1" />
+                                <span>Admin</span>
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-slate-300">Email Address</label>
@@ -111,7 +154,6 @@ export default function LoginForm() {
                             <p className="text-xs text-rose-400">{errors.password.message}</p>
                         )}
                     </div>
-
                 </CardContent>
 
                 <CardFooter className="flex flex-col space-y-4">

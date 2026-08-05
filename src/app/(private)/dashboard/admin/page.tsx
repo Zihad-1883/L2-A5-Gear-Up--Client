@@ -1,4 +1,4 @@
-import { getAllUsers, getAllCategory } from "@/lib/actions/adminActions";
+import { getAllUsers } from "@/lib/actions/adminActions";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/utilis/jwt";
 import Link from "next/link";
@@ -16,7 +16,7 @@ import {
     CheckCircle2,
 } from "lucide-react";
 import { TUpdateUser } from "@/app/types/updateUser";
-import { TCategory } from "@/app/types/category";
+import { getAllCategories } from "@/lib/actions/publicActions";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,7 @@ const AdminDashboardPage = async () => {
 
     const [usersRes, categoriesRes] = await Promise.all([
         getAllUsers(),
-        getAllCategory(),
+        getAllCategories(),
     ]);
 
     const users: TUpdateUser[] = Array.isArray(usersRes) ? usersRes : usersRes?.data || [];
@@ -266,8 +266,8 @@ const AdminDashboardPage = async () => {
 
                                             <span
                                                 className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${isBlocked
-                                                        ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                                                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                                    ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                                                    : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                                                     }`}
                                             >
                                                 {isBlocked ? "Blocked" : "Active"}

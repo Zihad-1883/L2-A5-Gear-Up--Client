@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSingleGear } from "@/lib/actions/publicActions";
+import { getSingleGear, getGearReviews } from "@/lib/actions/publicActions";
 import { TGear, TReview } from "@/app/types/gear";
 import {
     ArrowLeft,
@@ -23,7 +23,10 @@ interface GearDetailPageProps {
 
 export default async function GearDetailPage({ params }: GearDetailPageProps) {
     const { id } = await params;
-    const res = await getSingleGear(id);
+    const [res, reviewsRes] = await Promise.all([
+        getSingleGear(id),
+        getGearReviews(id),
+    ]);
 
     const gear: TGear | null = res?.data || res?.result || res || null;
 
@@ -32,7 +35,12 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
     }
 
     const isAvailable = gear.stock > 0 && gear.isAvailable !== false;
-    const reviews: TReview[] = gear.reviews || [];
+    const fetchedReviews: TReview[] = Array.isArray(reviewsRes)
+        ? reviewsRes
+        : reviewsRes?.data || reviewsRes?.result || [];
+
+    const reviews: TReview[] =
+        gear.reviews && gear.reviews.length > 0 ? gear.reviews : fetchedReviews;
 
     // Calculate average rating if reviews exist
     const averageRating =

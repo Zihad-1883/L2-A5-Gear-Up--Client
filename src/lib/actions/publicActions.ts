@@ -32,7 +32,7 @@ export const getSingleGear = async (id: string) => {
         return data;
     } catch (error) {
         console.error("Error fetching gear:", error);
-        return { success: false, data: [] };
+        return { success: false, data: null };
     }
 };
 
@@ -49,6 +49,23 @@ export const getAllCategories = async () => {
         return data;
     } catch (error) {
         console.error("Error fetching categories:", error);
+        return { success: false, data: [] };
+    }
+};
+
+export const getGearReviews = async (gearItemId: string) => {
+    try {
+        const res = await fetch(`${baseUrl}/reviews/gear/${gearItemId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cache: "no-store",
+        });
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching gear reviews:", error);
         return { success: false, data: [] };
     }
 };

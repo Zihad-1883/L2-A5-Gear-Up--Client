@@ -44,8 +44,6 @@ export const updateUserStatus = async (userId: string, status: "ACTIVE" | "BLOCK
             }),
         });
         const data = await res.json();
-        console.log("Update User Status API Response:", data);
-
         revalidatePath("/dashboard/admin/all-users");
         return data;
     } catch (error) {
@@ -69,8 +67,6 @@ export const createCategory = async (categoryData: TCategory) => {
             cache: "no-store",
         });
         const data = await res.json();
-        console.log("Create Category API Response:", data);
-
         revalidatePath("/dashboard/admin/categories");
         return data;
     } catch (error) {
@@ -92,6 +88,27 @@ export const getAllCategory = async () => {
         return data;
     } catch (error) {
         console.error("Error fetching categories:", error);
+        return { success: false, data: [] };
+    }
+};
+
+export const getAllRentalsAdmin = async () => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("accessToken")?.value;
+
+        const res = await fetch(`${baseUrl}/rentals/admin`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}`, cookie: `accessToken=${token}` } : {}),
+            },
+            cache: "no-store",
+        });
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching admin rentals:", error);
         return { success: false, data: [] };
     }
 };
