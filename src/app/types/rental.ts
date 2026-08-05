@@ -38,6 +38,12 @@ export interface TRentalOrder {
         name?: string;
         email?: string;
     };
+    customer?: {
+        _id?: string;
+        id?: string;
+        name?: string;
+        email?: string;
+    };
     startDate: string;
     endDate: string;
     totalPrice?: number;
