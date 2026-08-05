@@ -7,36 +7,6 @@ import { revalidatePath } from "next/cache";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_API;
 
-export const createReview = async (reviewData: TReview) => {
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("accessToken")?.value;
-
-        const res = await fetch(`${baseUrl}/reviews`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}`, cookie: `accessToken=${token}` } : {}),
-            },
-            body: JSON.stringify({
-                gearItemId: reviewData.gearItemId || reviewData.gearId,
-                rating: Number(reviewData.rating) || 5,
-                comment: reviewData.comment || "",
-            }),
-            cache: "no-store",
-        });
-        const data = await res.json();
-
-        if (reviewData.gearItemId || reviewData.gearId) {
-            revalidatePath(`/gear/${reviewData.gearItemId || reviewData.gearId}`);
-        }
-        return data;
-    } catch (error) {
-        console.error("Error creating review:", error);
-        return { success: false, message: "Failed to create review" };
-    }
-};
-
 export const createRentalOrder = async (orderData: TCreateRentalOrder) => {
     try {
         const cookieStore = await cookies();
@@ -165,5 +135,35 @@ export const getMyPayments = async () => {
     } catch (error) {
         console.error("Error fetching my payments:", error);
         return { success: false, data: [] };
+    }
+};
+
+export const createReview = async (reviewData: TReview) => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("accessToken")?.value;
+
+        const res = await fetch(`${baseUrl}/reviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}`, cookie: `accessToken=${token}` } : {}),
+            },
+            body: JSON.stringify({
+                gearItemId: reviewData.gearItemId || reviewData.gearId,
+                rating: Number(reviewData.rating) || 5,
+                comment: reviewData.comment || "",
+            }),
+            cache: "no-store",
+        });
+        const data = await res.json();
+
+        if (reviewData.gearItemId || reviewData.gearId) {
+            revalidatePath(`/gear/${reviewData.gearItemId || reviewData.gearId}`);
+        }
+        return data;
+    } catch (error) {
+        console.error("Error creating review:", error);
+        return { success: false, message: "Failed to create review" };
     }
 };

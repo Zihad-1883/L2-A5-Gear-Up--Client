@@ -16,6 +16,7 @@ import {
     CheckCircle2,
 } from "lucide-react";
 import { TUpdateUser } from "@/app/types/updateUser";
+import { TCategory } from "@/app/types/category";
 import { getAllCategories } from "@/lib/actions/publicActions";
 
 export const dynamic = "force-dynamic";

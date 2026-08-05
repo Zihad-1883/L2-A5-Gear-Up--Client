@@ -47,11 +47,6 @@ export default function DashboardSidebar({ user }: { user: TUser | null }) {
             icon: Layers,
         },
         {
-            name: "All Gears",
-            path: "/dashboard/admin/all-gears",
-            icon: Wrench,
-        },
-        {
             name: "All Orders",
             path: "/dashboard/admin/orders",
             icon: ShoppingBag,

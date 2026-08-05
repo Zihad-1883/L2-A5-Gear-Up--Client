@@ -2,14 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSingleGear, getGearReviews } from "@/lib/actions/publicActions";
 import { TGear, TReview } from "@/app/types/gear";
+import RentalBookingWidget from "@/components/gear/RentalBookingWidget";
 import {
     ArrowLeft,
     Building2,
     Boxes,
     ShieldCheck,
     PackageCheck,
-    Sparkles,
-    CheckCircle2,
     Info,
     MessageSquare,
     Star,
@@ -46,9 +45,9 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
     const averageRating =
         reviews.length > 0
             ? (
-                  reviews.reduce((acc, curr) => acc + (curr.rating || 0), 0) /
-                  reviews.length
-              ).toFixed(1)
+                reviews.reduce((acc, curr) => acc + (curr.rating || 0), 0) /
+                reviews.length
+            ).toFixed(1)
             : null;
 
     return (
@@ -77,11 +76,10 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                                 </div>
 
                                 <div
-                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${
-                                        isAvailable
-                                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                            : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                                    }`}
+                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${isAvailable
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                        }`}
                                 >
                                     <PackageCheck className="h-3.5 w-3.5" />
                                     <span>{isAvailable ? `${gear.stock} Available` : "Out of Stock"}</span>
@@ -175,10 +173,10 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                                     const authorName = rev.user?.name || rev.userName || "Customer";
                                     const createdDate = rev.createdAt
                                         ? new Date(rev.createdAt).toLocaleDateString("en-US", {
-                                              year: "numeric",
-                                              month: "short",
-                                              day: "numeric",
-                                          })
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric",
+                                        })
                                         : null;
 
                                     return (
@@ -206,11 +204,10 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                                                     {[1, 2, 3, 4, 5].map((star) => (
                                                         <Star
                                                             key={star}
-                                                            className={`h-3.5 w-3.5 ${
-                                                                star <= rating
-                                                                    ? "fill-amber-400 stroke-amber-400"
-                                                                    : "text-slate-700 stroke-slate-700"
-                                                            }`}
+                                                            className={`h-3.5 w-3.5 ${star <= rating
+                                                                ? "fill-amber-400 stroke-amber-400"
+                                                                : "text-slate-700 stroke-slate-700"
+                                                                }`}
                                                         />
                                                     ))}
                                                 </div>
@@ -226,24 +223,13 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                         )}
                     </div>
 
-                    {/* Action Bar */}
-                    <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 text-xs text-slate-400">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                            <span>Instant booking with flexible daily rental rates.</span>
-                        </div>
-
-                        <Link
-                            href={`/dashboard/customer/orders?gearId=${gear._id || gear.id}`}
-                            className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold shadow-lg transition-all active:scale-[0.98] ${
-                                isAvailable
-                                    ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 shadow-teal-500/20 hover:from-teal-400 hover:to-emerald-400"
-                                    : "bg-slate-800 text-slate-500 cursor-not-allowed pointer-events-none"
-                            }`}
-                        >
-                            <Sparkles className="h-4 w-4" />
-                            <span>{isAvailable ? "Proceed to Rent Gear" : "Currently Unavailable"}</span>
-                        </Link>
+                    {/* Rental Booking Widget */}
+                    <div className="pt-6 border-t border-slate-800">
+                        <RentalBookingWidget
+                            gearItemId={gear._id || gear.id || id}
+                            pricePerDay={Number(gear.price) || 0}
+                            isAvailable={isAvailable}
+                        />
                     </div>
                 </div>
             </div>
