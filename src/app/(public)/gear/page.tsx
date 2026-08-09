@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { getAllGears, getAllCategories } from "@/lib/actions/publicActions";
 import { TGear } from "@/app/types/gear";
 import { TCategory } from "@/app/types/category";
@@ -24,6 +23,55 @@ type SortOption = "default" | "price-asc" | "price-desc" | "name";
 
 const DEFAULT_GEAR_IMAGE =
     "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop";
+
+function GearCardImage({
+    src,
+    alt,
+    categoryName,
+}: {
+    src: string;
+    alt: string;
+    categoryName?: string;
+}) {
+    const getCategoryFallback = () => {
+        const cat = (categoryName || "").toLowerCase();
+        if (cat.includes("water") || cat.includes("jacket") || cat.includes("kayak")) {
+            return "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop";
+        }
+        if (cat.includes("camp") || cat.includes("hike") || cat.includes("tent")) {
+            return "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=800&auto=format&fit=crop";
+        }
+        if (cat.includes("bike") || cat.includes("cycl")) {
+            return "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=800&auto=format&fit=crop";
+        }
+        return DEFAULT_GEAR_IMAGE;
+    };
+
+    const initialSrc = src && src.trim() !== "" ? src : getCategoryFallback();
+    const [imgSrc, setImgSrc] = useState(initialSrc);
+    const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        const newSrc = src && src.trim() !== "" ? src : getCategoryFallback();
+        setImgSrc(newSrc);
+        setHasError(false);
+    }, [src, categoryName]);
+
+    return (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+            src={hasError ? getCategoryFallback() : imgSrc}
+            alt={alt}
+            onError={() => {
+                if (!hasError) {
+                    setHasError(true);
+                    setImgSrc(getCategoryFallback());
+                }
+            }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+    );
+}
 
 export default function BrowseGearPage() {
     const [gears, setGears] = useState<TGear[]>([]);
@@ -92,7 +140,7 @@ export default function BrowseGearPage() {
         if (gear.imageUrl && gear.imageUrl.trim() !== "") return gear.imageUrl;
         if (gear.images && gear.images.length > 0 && gear.images[0].trim() !== "")
             return gear.images[0];
-        return DEFAULT_GEAR_IMAGE;
+        return "";
     };
 
     const filteredGears = useMemo(() => {
@@ -303,15 +351,12 @@ export default function BrowseGearPage() {
                                     className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md overflow-hidden hover:border-teal-500/40 hover:bg-slate-900/90 transition-all duration-300 shadow-lg hover:shadow-teal-500/10"
                                 >
                                     <div className="relative w-full h-48 bg-slate-950 overflow-hidden">
-                                        <Image
+                                        <GearCardImage
                                             src={gearImg}
                                             alt={gear.name}
-                                            fill
-                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            unoptimized={gearImg.startsWith("http")}
+                                            categoryName={categoryName}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
 
                                         <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 text-[11px] font-medium text-slate-300 shadow-md">
                                             <Tag className="h-3 w-3 text-teal-400" />
@@ -322,10 +367,11 @@ export default function BrowseGearPage() {
 
                                         <div className="absolute top-3 right-3">
                                             <span
-                                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md border shadow-md ${isAvailable
+                                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md border shadow-md ${
+                                                    isAvailable
                                                         ? "bg-emerald-950/80 text-emerald-400 border-emerald-500/30"
                                                         : "bg-rose-950/80 text-rose-400 border-rose-500/30"
-                                                    }`}
+                                                }`}
                                             >
                                                 {isAvailable ? (
                                                     <PackageCheck className="h-3 w-3" />

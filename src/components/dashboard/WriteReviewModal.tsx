@@ -115,11 +115,10 @@ export default function WriteReviewModal({
                                     className="p-1 focus:outline-none transition-transform hover:scale-125 duration-150"
                                 >
                                     <Star
-                                        className={`h-7 w-7 transition-colors ${
-                                            star <= currentRating
-                                                ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                                                : "text-slate-700 stroke-slate-700 hover:text-slate-500"
-                                        }`}
+                                        className={`h-7 w-7 transition-colors ${star <= currentRating
+                                            ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                                            : "text-slate-700 stroke-slate-700 hover:text-slate-500"
+                                            }`}
                                     />
                                 </button>
                             ))}

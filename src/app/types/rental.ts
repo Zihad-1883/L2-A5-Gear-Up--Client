@@ -49,6 +49,7 @@ export interface TRentalOrder {
     totalPrice?: number;
     rentalOrderStatus: TRentalStatus;
     paymentStatus?: "PENDING" | "PAID" | "FAILED" | "CANCELLED";
+    isReviewed?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }

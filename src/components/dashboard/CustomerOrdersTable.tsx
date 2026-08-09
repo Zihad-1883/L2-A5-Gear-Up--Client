@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TRentalOrder } from "@/app/types/rental";
 import { cancelRentalOrder, createPaymentSession } from "@/lib/actions/customerActions";
 import { toast } from "sonner";
@@ -37,6 +37,30 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [orderToCancel, setOrderToCancel] = useState<TRentalOrder | null>(null);
     const [reviewOrder, setReviewOrder] = useState<TRentalOrder | null>(null);
+    const [reviewedOrderIds, setReviewedOrderIds] = useState<Record<string, boolean>>({});
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem("gearup_reviewed_orders");
+            if (saved) {
+                setReviewedOrderIds(JSON.parse(saved));
+            }
+        } catch (e) {
+            console.error("Failed to parse reviewed orders from localStorage", e);
+        }
+    }, []);
+
+    const handleReviewSuccess = (orderId: string, gearItemId: string) => {
+        setReviewedOrderIds((prev) => {
+            const updated = { ...prev, [orderId]: true, [gearItemId]: true };
+            try {
+                localStorage.setItem("gearup_reviewed_orders", JSON.stringify(updated));
+            } catch (e) {
+                console.error("Failed to save reviewed orders to localStorage", e);
+            }
+            return updated;
+        });
+    };
 
     const handleConfirmCancel = async () => {
         if (!orderToCancel) return;
@@ -195,6 +219,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                     <tbody className="divide-y divide-slate-800/80">
                         {orders.map((order, idx) => {
                             const orderId = order._id || order.id || `ord-${idx}`;
+                            const gearItemId = order.gearItemId || order.gearItem?._id || order.gearItem?.id || order.gear?._id || order.gear?.id || "";
                             const gearName =
                                 order.gearItem?.name ||
                                 order.gear?.name ||
@@ -223,6 +248,11 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                             const isApproved = order.rentalOrderStatus === "APPROVED";
                             const isReturned = order.rentalOrderStatus === "RETURNED";
                             const isLoading = loadingId === orderId;
+
+                            const isAlreadyReviewed =
+                                Boolean(order.isReviewed) ||
+                                Boolean(reviewedOrderIds[orderId]) ||
+                                Boolean(gearItemId && reviewedOrderIds[gearItemId]);
 
                             return (
                                 <tr
@@ -278,14 +308,21 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                                         )}
 
                                         {isReturned && (
-                                            <Button
-                                                onClick={() => setReviewOrder(order)}
-                                                size="sm"
-                                                className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition-all hover:scale-105"
-                                            >
-                                                <Star className="h-3.5 w-3.5 mr-1 fill-amber-400" />
-                                                Write Review
-                                            </Button>
+                                            isAlreadyReviewed ? (
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                                    Reviewed
+                                                </span>
+                                            ) : (
+                                                <Button
+                                                    onClick={() => setReviewOrder(order)}
+                                                    size="sm"
+                                                    className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition-all hover:scale-105"
+                                                >
+                                                    <Star className="h-3.5 w-3.5 mr-1 fill-amber-400" />
+                                                    Write Review
+                                                </Button>
+                                            )
                                         )}
                                     </td>
                                 </tr>
@@ -354,6 +391,11 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                     gearItemId={reviewOrder.gearItemId || reviewOrder.gearItem?._id || reviewOrder.gearItem?.id || reviewOrder.gear?._id || reviewOrder.gear?.id || ""}
                     gearName={reviewOrder.gearItem?.name || reviewOrder.gear?.name || "Equipment"}
                     gearBrand={reviewOrder.gearItem?.brand || reviewOrder.gear?.brand}
+                    onSuccess={() => {
+                        const currentOrderId = reviewOrder._id || reviewOrder.id || "";
+                        const currentGearId = reviewOrder.gearItemId || reviewOrder.gearItem?._id || reviewOrder.gearItem?.id || reviewOrder.gear?._id || reviewOrder.gear?.id || "";
+                        handleReviewSuccess(currentOrderId, currentGearId);
+                    }}
                 />
             )}
         </div>
