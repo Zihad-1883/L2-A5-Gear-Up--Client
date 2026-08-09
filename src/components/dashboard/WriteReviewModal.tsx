@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, MessageSquare, Loader2, Sparkles } from "lucide-react";
+import { Star, MessageSquare, Loader2, Sparkles, X } from "lucide-react";
 import { createReview } from "@/lib/actions/customerActions";
 import { toast } from "sonner";
 
@@ -72,10 +72,21 @@ export default function WriteReviewModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-6 sm:p-8 text-slate-100 shadow-2xl space-y-6">
-                <div className="space-y-1.5">
+            <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-800 bg-slate-900 p-6 sm:p-8 text-slate-100 shadow-2xl space-y-6 relative">
+                {/* Close Button Top Right */}
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="absolute right-5 top-5 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                    aria-label="Close modal"
+                >
+                    <X className="h-5 w-5" />
+                </button>
+
+                {/* Modal Header */}
+                <div className="space-y-1.5 pr-6">
                     <div className="flex items-center gap-2">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-400 border border-teal-500/20 shrink-0">
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div>
@@ -89,7 +100,7 @@ export default function WriteReviewModal({
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-
+                    {/* Interactive Star Rating */}
                     <div className="space-y-2 text-center bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
                         <label className="text-xs font-extrabold uppercase text-slate-400 tracking-wider block">
                             Rating: <span className="text-amber-400 lowercase font-bold">{ratingLabels[currentRating]}</span>
@@ -105,16 +116,18 @@ export default function WriteReviewModal({
                                     className="p-1 focus:outline-none transition-transform hover:scale-125 duration-150"
                                 >
                                     <Star
-                                        className={`h-7 w-7 transition-colors ${star <= currentRating
-                                            ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                                            : "text-slate-700 stroke-slate-700 hover:text-slate-500"
-                                            }`}
+                                        className={`h-7 w-7 transition-colors ${
+                                            star <= currentRating
+                                                ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                                                : "text-slate-700 stroke-slate-700 hover:text-slate-500"
+                                        }`}
                                     />
                                 </button>
                             ))}
                         </div>
                     </div>
 
+                    {/* Detailed Comment Box */}
                     <div className="space-y-1.5">
                         <label className="text-xs font-extrabold uppercase text-slate-300 tracking-wider flex items-center gap-1.5">
                             <MessageSquare className="h-3.5 w-3.5 text-teal-400" />
@@ -130,7 +143,8 @@ export default function WriteReviewModal({
                         />
                     </div>
 
-                    <div className="flex items-center justify-end gap-3 pt-2">
+                    {/* Modal Footer Buttons */}
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
                         <button
                             type="button"
                             onClick={onClose}
@@ -142,7 +156,7 @@ export default function WriteReviewModal({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="inline-flex items-center gap-2 px-6 py-2.5 text-xs font-bold rounded-xl text-slate-950 bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 shadow-lg shadow-teal-500/20 transition-all disabled:opacity-50"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-bold rounded-xl text-slate-950 bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 shadow-lg shadow-teal-500/20 transition-all cursor-pointer disabled:opacity-50"
                         >
                             {isSubmitting ? (
                                 <>
@@ -162,3 +176,4 @@ export default function WriteReviewModal({
         </div>
     );
 }
+
