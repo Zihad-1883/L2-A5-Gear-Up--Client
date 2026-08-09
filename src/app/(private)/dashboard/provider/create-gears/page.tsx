@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createGears } from "@/lib/actions/providerActions";
-import { getAllCategory } from "@/lib/actions/adminActions";
+import { getAllCategories } from "@/lib/actions/publicActions";
 import { TCategory } from "@/app/types/category";
 import { TCreateGears } from "@/app/types/gear";
 import { toast } from "sonner";
@@ -17,6 +17,8 @@ import {
     FileText,
     Loader2,
     Building2,
+    Image as ImageIcon,
+    Link as LinkIcon,
 } from "lucide-react";
 
 export default function CreateGearsPage() {
@@ -29,13 +31,16 @@ export default function CreateGearsPage() {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<TCreateGears>();
+
+    const watchImageUrl = watch("imageUrl");
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await getAllCategory();
+                const res = await getAllCategories();
                 const catData = Array.isArray(res) ? res : res?.data || res?.result || [];
                 setCategories(catData);
             } catch (err) {
@@ -51,6 +56,7 @@ export default function CreateGearsPage() {
         setIsSubmitting(true);
 
         try {
+            const photoUrl = data.imageUrl?.trim() || "";
             const payload: TCreateGears = {
                 name: data.name.trim(),
                 brand: data.brand.trim(),
@@ -58,6 +64,8 @@ export default function CreateGearsPage() {
                 stock: Number(data.stock) || 1,
                 categoryId: data.categoryId,
                 description: data.description.trim(),
+                imageUrl: photoUrl || undefined,
+                images: photoUrl ? [photoUrl] : undefined,
             };
 
             const res = await createGears(payload);
@@ -95,6 +103,7 @@ export default function CreateGearsPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-md space-y-6 shadow-xl">
+                    {/* General Information */}
                     <div className="space-y-4">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <Tag className="h-4 w-4" />
@@ -102,7 +111,6 @@ export default function CreateGearsPage() {
                         </h2>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
                             <div className="space-y-1.5 sm:col-span-2">
                                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                                     <PackagePlus className="h-3.5 w-3.5 text-teal-400" />
@@ -168,6 +176,55 @@ export default function CreateGearsPage() {
                         </div>
                     </div>
 
+                    {/* Photo & Media Section */}
+                    <div className="space-y-4 pt-2">
+                        <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                            <ImageIcon className="h-4 w-4" />
+                            Equipment Photo URL
+                        </h2>
+
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                                    <LinkIcon className="h-3.5 w-3.5 text-teal-400" />
+                                    Image Direct URL
+                                </label>
+                                <input
+                                    type="url"
+                                    placeholder="e.g. https://images.unsplash.com/photo-1517649763962..."
+                                    {...register("imageUrl")}
+                                    className="w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:border-teal-500/50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"
+                                />
+                                <p className="text-[11px] text-slate-500">
+                                    Provide a public photo URL (Unsplash, ImgBB, Cloudinary, etc.) to showcase this gear.
+                                </p>
+                            </div>
+
+                            {/* Live Photo Preview Card */}
+                            {watchImageUrl && watchImageUrl.trim() !== "" && (
+                                <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 space-y-2">
+                                    <p className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
+                                        <ImageIcon className="h-3.5 w-3.5 text-teal-400" />
+                                        Photo Preview:
+                                    </p>
+                                    <div className="relative h-48 w-full max-w-sm rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={watchImageUrl.trim()}
+                                            alt="Gear preview"
+                                            className="h-full w-full object-cover"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src =
+                                                    "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop";
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Pricing & Inventory */}
                     <div className="space-y-4 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <DollarSign className="h-4 w-4" />
@@ -218,6 +275,7 @@ export default function CreateGearsPage() {
                         </div>
                     </div>
 
+                    {/* Details & Description */}
                     <div className="space-y-4 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <FileText className="h-4 w-4" />

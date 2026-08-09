@@ -41,7 +41,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
     const reviews: TReview[] =
         gear.reviews && gear.reviews.length > 0 ? gear.reviews : fetchedReviews;
 
-    // Calculate average rating if reviews exist
     const averageRating =
         reviews.length > 0
             ? (
@@ -53,7 +52,7 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
-                {/* Navigation Back Link */}
+
                 <div>
                     <Link
                         href="/gear"
@@ -64,9 +63,8 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                     </Link>
                 </div>
 
-                {/* Main Card Section */}
                 <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-10 backdrop-blur-xl space-y-8 shadow-2xl">
-                    {/* Header Strip */}
+
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6">
                         <div className="space-y-2">
                             <div className="flex items-center gap-2.5">
@@ -91,7 +89,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                             </h1>
                         </div>
 
-                        {/* Price Badge */}
                         <div className="rounded-2xl border border-teal-500/30 bg-teal-500/10 p-4 text-right">
                             <span className="text-xs uppercase font-bold text-teal-400 block tracking-wider">Rental Price</span>
                             <div className="flex items-baseline gap-1">
@@ -101,7 +98,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                         </div>
                     </div>
 
-                    {/* Specifications Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4 space-y-1">
                             <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -128,7 +124,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                         </div>
                     </div>
 
-                    {/* Description Section */}
                     <div className="space-y-3 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
                             <Info className="h-4 w-4" />
@@ -139,7 +134,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                         </p>
                     </div>
 
-                    {/* Customer Reviews Section */}
                     <div className="space-y-4 pt-4 border-t border-slate-800/80">
                         <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                             <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
@@ -223,7 +217,6 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                         )}
                     </div>
 
-                    {/* Rental Booking Widget */}
                     <div className="pt-6 border-t border-slate-800">
                         <RentalBookingWidget
                             gearItemId={gear._id || gear.id || id}

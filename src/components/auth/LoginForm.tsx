@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff, Sparkles, User, Store } from "lucide-react";
+import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff, Sparkles, User, Store, Loader2 } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,16 @@ export default function LoginForm() {
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get("redirect");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isColdStart, setIsColdStart] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    // Warm up backend when login form renders
+    useEffect(() => {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_API || "https://gearup-backend-4eca.onrender.com/api";
+        // Ping backend health and root to wake up Render instance immediately
+        fetch(`${baseUrl.replace(/\/api\/?$/, "")}/health`, { mode: "no-cors" }).catch(() => {});
+        fetch(baseUrl, { mode: "no-cors" }).catch(() => {});
+    }, []);
 
     const {
         register,
@@ -41,22 +50,44 @@ export default function LoginForm() {
         },
     });
 
-    const onSubmit = async (data: LoginFormValues) => {
+    const executeLogin = async (data: LoginFormValues) => {
         setIsSubmitting(true);
-        const res = await loginUser(data);
-        if (res?.success) {
-            toast.success(res?.message || "Logged in successfully!");
-            router.push(redirectPath || "/");
-        } else {
-            toast.error(res?.message || "Login failed. Please check your credentials.");
+        setIsColdStart(false);
+
+        // Timer to warn user if Render cold start is occurring
+        const coldStartTimer = setTimeout(() => {
+            setIsColdStart(true);
+        }, 2500);
+
+        try {
+            const res = await loginUser(data);
+            if (res?.success) {
+                toast.success(res?.message || "Logged in successfully!");
+                router.push(redirectPath || "/");
+                router.refresh();
+            } else {
+                toast.error(res?.message || "Login failed. Please check your credentials.");
+            }
+        } catch (err) {
+            console.error("Submit error:", err);
+            toast.error("An unexpected error occurred during login.");
+        } finally {
+            clearTimeout(coldStartTimer);
+            setIsSubmitting(false);
+            setIsColdStart(false);
         }
-        setIsSubmitting(false);
     };
 
-    const handleDemoFill = (email: string, pass: string) => {
+    const onSubmit = (data: LoginFormValues) => {
+        executeLogin(data);
+    };
+
+    // 1-Click Instant Demo Login
+    const handleDemoLogin = (email: string, pass: string) => {
         setValue("email", email, { shouldValidate: true });
         setValue("password", pass, { shouldValidate: true });
-        toast.info(`Filled credentials for ${email}`);
+        toast.info(`Logging in with demo account (${email})...`);
+        executeLogin({ email, password: pass });
     };
 
     return (
@@ -75,15 +106,19 @@ export default function LoginForm() {
                 <CardContent className="space-y-4">
                     {/* Demo Login Shortcuts */}
                     <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-teal-400">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            <span>Quick Demo Accounts:</span>
+                        <div className="flex items-center justify-between text-xs font-bold text-teal-400">
+                            <span className="flex items-center gap-1.5">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                1-Click Demo Login:
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-normal">Click to login</span>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                             <button
                                 type="button"
-                                onClick={() => handleDemoFill("arif.customer@gearup.com", "Pass@1234")}
-                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-teal-500/50 hover:bg-slate-800 hover:text-teal-300 transition-all active:scale-[0.97]"
+                                disabled={isSubmitting}
+                                onClick={() => handleDemoLogin("arif.customer@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-teal-500/50 hover:bg-slate-800 hover:text-teal-300 transition-all active:scale-[0.97] disabled:opacity-50"
                             >
                                 <User className="h-3.5 w-3.5 text-teal-400 mb-1" />
                                 <span>Customer</span>
@@ -91,8 +126,9 @@ export default function LoginForm() {
 
                             <button
                                 type="button"
-                                onClick={() => handleDemoFill("summit.provider@gearup.com", "Pass@1234")}
-                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-emerald-500/50 hover:bg-slate-800 hover:text-emerald-300 transition-all active:scale-[0.97]"
+                                disabled={isSubmitting}
+                                onClick={() => handleDemoLogin("summit.provider@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-emerald-500/50 hover:bg-slate-800 hover:text-emerald-300 transition-all active:scale-[0.97] disabled:opacity-50"
                             >
                                 <Store className="h-3.5 w-3.5 text-emerald-400 mb-1" />
                                 <span>Provider</span>
@@ -100,14 +136,23 @@ export default function LoginForm() {
 
                             <button
                                 type="button"
-                                onClick={() => handleDemoFill("admin@gearup.com", "Pass@1234")}
-                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-purple-500/50 hover:bg-slate-800 hover:text-purple-300 transition-all active:scale-[0.97]"
+                                disabled={isSubmitting}
+                                onClick={() => handleDemoLogin("admin@gearup.com", "Pass@1234")}
+                                className="flex flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/80 p-2 text-[11px] font-medium text-slate-300 hover:border-purple-500/50 hover:bg-slate-800 hover:text-purple-300 transition-all active:scale-[0.97] disabled:opacity-50"
                             >
                                 <Shield className="h-3.5 w-3.5 text-purple-400 mb-1" />
                                 <span>Admin</span>
                             </button>
                         </div>
                     </div>
+
+                    {/* Cold Start Indicator Notice */}
+                    {isColdStart && (
+                        <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl animate-pulse">
+                            <Loader2 className="h-4 w-4 animate-spin shrink-0 text-amber-400" />
+                            <span>Waking up cloud backend (Render cold start ~20s)... Please wait!</span>
+                        </div>
+                    )}
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-slate-300">Email Address</label>
@@ -164,8 +209,17 @@ export default function LoginForm() {
                         size="lg"
                         className="w-full"
                     >
-                        {isSubmitting ? "Logging In..." : "Login"}
-                        <ArrowRight className="h-4 w-4" />
+                        {isSubmitting ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {isColdStart ? "Waking Server..." : "Logging In..."}
+                            </span>
+                        ) : (
+                            <>
+                                Login
+                                <ArrowRight className="h-4 w-4" />
+                            </>
+                        )}
                     </Button>
 
                     <p className="text-center text-xs text-slate-400">

@@ -170,19 +170,25 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                             const orderPrice = Number(order.totalPrice) || 0;
                             const isUpdating = updatingId === orderId;
                             const currentStatus = order.rentalOrderStatus?.toUpperCase() || "PENDING";
+                            const paymentStatus = order.paymentStatus?.toUpperCase();
+
+                            const isPending = currentStatus === "PENDING";
+                            const canMarkPickedUp =
+                                (currentStatus === "APPROVED" || currentStatus === "PAID" || paymentStatus === "PAID") &&
+                                currentStatus !== "PICKED_UP" &&
+                                currentStatus !== "RETURNED";
+                            const canMarkReturned = currentStatus === "PICKED_UP";
 
                             return (
                                 <tr
                                     key={orderId}
                                     className="hover:bg-slate-800/40 transition-colors"
                                 >
-                                    {/* Equipment */}
                                     <td className="py-4 px-6">
                                         <div className="font-bold text-white text-base">{gearName}</div>
                                         <div className="text-xs text-slate-400">{gearBrand}</div>
                                     </td>
 
-                                    {/* Customer */}
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
                                             <User className="h-3.5 w-3.5 text-teal-400" />
@@ -194,7 +200,6 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                         </div>
                                     </td>
 
-                                    {/* Dates */}
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-1.5 text-xs text-slate-300 font-semibold">
                                             <Calendar className="h-3.5 w-3.5 text-teal-400 shrink-0" />
@@ -204,17 +209,22 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                         </div>
                                     </td>
 
-                                    {/* Total Price */}
                                     <td className="py-4 px-6 font-extrabold text-white text-base">
                                         ${orderPrice.toFixed(2)}
                                     </td>
 
-                                    {/* Status Badge */}
-                                    <td className="py-4 px-6">
-                                        {getStatusBadge(currentStatus)}
+                                    <td className="py-4 px-6 space-y-1">
+                                        <div>{getStatusBadge(currentStatus)}</div>
+                                        {paymentStatus === "PAID" && (
+                                            <div>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                    <CheckCircle2 className="h-3 w-3" />
+                                                    Payment Received
+                                                </span>
+                                            </div>
+                                        )}
                                     </td>
-
-                                    {/* Action Buttons */}
+                                    
                                     <td className="py-4 px-6 text-right">
                                         {isUpdating ? (
                                             <div className="inline-flex items-center gap-1 text-xs text-teal-400 font-semibold">
@@ -223,7 +233,7 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                             </div>
                                         ) : (
                                             <div className="flex items-center justify-end gap-1.5">
-                                                {currentStatus === "PENDING" && (
+                                                {isPending && (
                                                     <>
                                                         <Button
                                                             onClick={() => handleStatusChange(orderId, "APPROVED")}
@@ -245,30 +255,37 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                                                     </>
                                                 )}
 
-                                                {currentStatus === "APPROVED" && (
+                                                {canMarkPickedUp && (
                                                     <Button
                                                         onClick={() => handleStatusChange(orderId, "PICKED_UP")}
                                                         size="sm"
-                                                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md border border-blue-400/30"
+                                                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md border border-blue-400/30 transition-all hover:scale-105"
                                                     >
                                                         <Truck className="h-3.5 w-3.5 mr-1" />
                                                         Mark Picked Up
                                                     </Button>
                                                 )}
 
-                                                {currentStatus === "PICKED_UP" && (
+                                                {canMarkReturned && (
                                                     <Button
                                                         onClick={() => handleStatusChange(orderId, "RETURNED")}
                                                         size="sm"
-                                                        className="bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-md border border-teal-400/30"
+                                                        className="bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow-md border border-teal-400/30 transition-all hover:scale-105"
                                                     >
                                                         <RotateCcw className="h-3.5 w-3.5 mr-1" />
                                                         Mark Returned
                                                     </Button>
                                                 )}
 
-                                                {(currentStatus === "RETURNED" || currentStatus === "REJECTED" || currentStatus === "CANCELLED") && (
-                                                    <span className="text-xs text-slate-500 italic">No actions</span>
+                                                {currentStatus === "RETURNED" && (
+                                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                                        Returned (Completed)
+                                                    </span>
+                                                )}
+
+                                                {(currentStatus === "REJECTED" || currentStatus === "CANCELLED") && (
+                                                    <span className="text-xs text-slate-500 italic">No actions available</span>
                                                 )}
                                             </div>
                                         )}

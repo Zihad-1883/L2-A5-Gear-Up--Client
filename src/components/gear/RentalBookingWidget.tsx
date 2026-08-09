@@ -21,10 +21,7 @@ export default function RentalBookingWidget({
 }: RentalBookingWidgetProps) {
     const router = useRouter();
 
-    // Helper for today's date string YYYY-MM-DD
     const todayStr = new Date().toISOString().split("T")[0];
-
-    // Helper for tomorrow's date string YYYY-MM-DD
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
@@ -35,7 +32,6 @@ export default function RentalBookingWidget({
 
     const numPrice = Number(pricePerDay) || 0;
 
-    // Calculate total days
     const start = startDate ? new Date(`${startDate}T00:00:00`) : null;
     const end = endDate ? new Date(`${endDate}T00:00:00`) : null;
 
@@ -151,7 +147,6 @@ export default function RentalBookingWidget({
                 </div>
             </div>
 
-            {/* Validation Error Message */}
             {dateValidationError && (
                 <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-300">
                     <AlertCircle className="h-4 w-4 shrink-0" />
@@ -159,7 +154,6 @@ export default function RentalBookingWidget({
                 </div>
             )}
 
-            {/* Price breakdown */}
             {days > 0 && !dateValidationError && (
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 space-y-1.5 text-xs">
                     <div className="flex justify-between text-slate-400">

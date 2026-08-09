@@ -75,23 +75,6 @@ export const createCategory = async (categoryData: TCategory) => {
     }
 };
 
-export const getAllCategory = async () => {
-    try {
-        const res = await fetch(`${baseUrl}/categories`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cache: "force-cache",
-        });
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching categories:", error);
-        return { success: false, data: [] };
-    }
-};
-
 export const getAllRentalsAdmin = async () => {
     try {
         const cookieStore = await cookies();

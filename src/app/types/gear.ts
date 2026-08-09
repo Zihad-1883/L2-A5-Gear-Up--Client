@@ -5,6 +5,8 @@ export type TCreateGears = {
     price: number;
     stock: number;
     categoryId: string;
+    imageUrl?: string;
+    images?: string[];
 };
 
 export interface TReview {

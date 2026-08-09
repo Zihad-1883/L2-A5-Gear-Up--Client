@@ -34,7 +34,6 @@ export default function CategoryManagement({ initialCategories }: CategoryManage
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Form state
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -120,7 +119,6 @@ export default function CategoryManagement({ initialCategories }: CategoryManage
                 </button>
             </div>
 
-            {/* Creation Dialog Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent className="max-w-lg border-slate-800 bg-slate-900 text-slate-100 shadow-2xl">
                     <DialogHeader>
@@ -138,7 +136,7 @@ export default function CategoryManagement({ initialCategories }: CategoryManage
                     </DialogHeader>
 
                     <form onSubmit={handleSubmit} className="space-y-4 py-2">
-                        {/* Sample Fill Button */}
+
                         <div className="flex justify-end">
                             <button
                                 type="button"
@@ -213,7 +211,6 @@ export default function CategoryManagement({ initialCategories }: CategoryManage
                 </DialogContent>
             </Dialog>
 
-            {/* Categories List View */}
             <div className="space-y-4">
                 <h2 className="text-base font-bold text-slate-200 flex items-center gap-2">
                     <Layers className="h-4 w-4 text-teal-400" />

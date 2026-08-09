@@ -6,7 +6,7 @@ import { createNewAccessToken } from './utilis/accessToken';
 import { verifyToken } from './utilis/jwt';
 
 const AUTH_ROUTES = ["/login", "/register"];
-const PUBLIC_ROUTES = ["/", "/about", "/contact"];
+const PUBLIC_ROUTES = ["/", "/about", "/contact", "/gear", "/payment"];
 const ADMIN_ROUTES = ["/dashboard/admin"];
 const CUSTOMER_ROUTES = ["/dashboard/customer"];
 const PROVIDER_ROUTES = ["/dashboard/provider"];

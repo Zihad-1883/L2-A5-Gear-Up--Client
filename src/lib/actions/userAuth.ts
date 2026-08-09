@@ -3,43 +3,66 @@
 import { TLoginUser, TRegisterUser } from "@/app/types/userAuthData.type";
 import { cookies } from "next/headers";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_API;
+const getBaseUrl = () => {
+    return process.env.NEXT_PUBLIC_BASE_API || "http://localhost:5000/api";
+};
 
 export const registerUser = async (data: TRegisterUser) => {
-    const res = await fetch(`${baseUrl}/user/register`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-    const result = await res.json();
-    return result;
-}
+    try {
+        const res = await fetch(`${getBaseUrl()}/user/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+            cache: "no-store",
+        });
+        const result = await res.json();
+        return result;
+    } catch (error) {
+        console.error("Register error:", error);
+        return { success: false, message: "Server connection failed. Please try again." };
+    }
+};
 
 export const loginUser = async (data: TLoginUser) => {
-    const res = await fetch(`${baseUrl}/auth/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-    const result = await res.json();
+    try {
+        const res = await fetch(`${getBaseUrl()}/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+            cache: "no-store",
+        });
 
-    if (result?.success && result?.data?.accessToken) {
-        const cookieStore = await cookies();
-        cookieStore.set("accessToken", result.data.accessToken);
-        if (result?.data?.refreshToken) {
-            cookieStore.set("refreshToken", result.data.refreshToken);
+        const result = await res.json();
+
+        if (result?.success && result?.data?.accessToken) {
+            const cookieStore = await cookies();
+            cookieStore.set("accessToken", result.data.accessToken, {
+                path: "/",
+                httpOnly: true,
+                sameSite: "lax",
+            });
+            if (result?.data?.refreshToken) {
+                cookieStore.set("refreshToken", result.data.refreshToken, {
+                    path: "/",
+                    httpOnly: true,
+                    sameSite: "lax",
+                });
+            }
         }
-    }
 
-    return result;
-}
+        return result;
+    } catch (error) {
+        console.error("Login error:", error);
+        return { success: false, message: "Failed to connect to backend server. Please verify backend is running." };
+    }
+};
 
 export const logoutUser = async () => {
     const cookieStore = await cookies();
     cookieStore.delete("accessToken");
     cookieStore.delete("refreshToken");
-}
+};

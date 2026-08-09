@@ -1,11 +1,11 @@
-import { getAllCategory } from "@/lib/actions/adminActions";
+import { getAllCategories } from "@/lib/actions/publicActions";
 import CategoryManagement from "@/components/dashboard/CategoryManagement";
 import { TCategory } from "@/app/types/category";
 
 export const dynamic = "force-dynamic";
 
 const CategoriesPage = async () => {
-    const result = await getAllCategory();
+    const result = await getAllCategories();
     const categories: TCategory[] = Array.isArray(result)
         ? result
         : result?.data || result?.result || [];

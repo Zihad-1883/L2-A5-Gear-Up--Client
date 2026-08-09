@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import BackendWarmup from "@/components/shared/BackendWarmup";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/utilis/jwt";
@@ -39,6 +40,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+        <BackendWarmup />
         <Navbar user={user} />
         <main className="flex-1">{children}</main>
         <Footer />

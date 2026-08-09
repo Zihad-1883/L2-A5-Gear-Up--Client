@@ -99,7 +99,7 @@ const CustomerDashboardPage = async () => {
 
     return (
         <div className="space-y-8">
-            {/* Header Hero Banner */}
+
             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900/90 to-teal-950/40 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
                 <div className="absolute -right-12 -top-12 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -135,9 +135,8 @@ const CustomerDashboardPage = async () => {
                 </div>
             </div>
 
-            {/* Metrics Overview Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {/* Total Orders */}
+
                 <div className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md hover:border-teal-500/40 transition-all">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-slate-400">Total Bookings</span>
@@ -153,7 +152,6 @@ const CustomerDashboardPage = async () => {
                     </div>
                 </div>
 
-                {/* Approved & Ready to Pay */}
                 <div className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md hover:border-emerald-500/40 transition-all">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-slate-400">Approved (Ready to Pay)</span>
@@ -167,7 +165,6 @@ const CustomerDashboardPage = async () => {
                     </div>
                 </div>
 
-                {/* Active Rentals */}
                 <div className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md hover:border-blue-500/40 transition-all">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-slate-400">Active Gear Rentals</span>
@@ -181,7 +178,6 @@ const CustomerDashboardPage = async () => {
                     </div>
                 </div>
 
-                {/* Completed Rentals */}
                 <div className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-md hover:border-purple-500/40 transition-all">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-slate-400">Completed Rentals</span>
@@ -196,7 +192,6 @@ const CustomerDashboardPage = async () => {
                 </div>
             </div>
 
-            {/* Quick Action Navigation */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link
                     href="/gear"
@@ -247,7 +242,6 @@ const CustomerDashboardPage = async () => {
                 </Link>
             </div>
 
-            {/* Recent Orders Preview */}
             <div className="rounded-3xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-xl space-y-4">
                 <div className="flex items-center justify-between">
                     <div>

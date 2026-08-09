@@ -13,7 +13,7 @@ const CustomerOrdersPage = async () => {
 
     return (
         <div className="space-y-8">
-            {/* Header Banner */}
+
             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900/90 to-teal-950/40 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
                 <div className="absolute -right-12 -top-12 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
                 <div className="relative z-10 space-y-2">
@@ -31,7 +31,6 @@ const CustomerOrdersPage = async () => {
                 </div>
             </div>
 
-            {/* Orders Table */}
             <CustomerOrdersTable initialOrders={orders} />
         </div>
     );

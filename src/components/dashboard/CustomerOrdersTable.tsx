@@ -14,8 +14,17 @@ import {
     RotateCcw,
     CreditCard,
     AlertCircle,
+    Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 interface CustomerOrdersTableProps {
     initialOrders: TRentalOrder[];
@@ -24,15 +33,19 @@ interface CustomerOrdersTableProps {
 export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTableProps) {
     const [orders, setOrders] = useState<TRentalOrder[]>(initialOrders);
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [orderToCancel, setOrderToCancel] = useState<TRentalOrder | null>(null);
 
-    const handleCancelOrder = async (orderId: string) => {
-        if (!confirm("Are you sure you want to cancel this rental order?")) return;
+    const handleConfirmCancel = async () => {
+        if (!orderToCancel) return;
+
+        const orderId = orderToCancel._id || orderToCancel.id;
+        if (!orderId) return;
 
         setLoadingId(orderId);
         try {
             const res = await cancelRentalOrder(orderId);
             if (res?.success) {
-                toast.success(res?.message || "Order cancelled successfully");
+                toast.success(res?.message || "Rental order cancelled successfully");
                 setOrders((prev) =>
                     prev.map((ord) =>
                         (ord._id === orderId || ord.id === orderId)
@@ -40,6 +53,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                             : ord
                     )
                 );
+                setOrderToCancel(null);
             } else {
                 toast.error(res?.message || "Failed to cancel order");
             }
@@ -157,6 +171,11 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
         );
     }
 
+    const cancelGearName =
+        orderToCancel?.gearItem?.name ||
+        orderToCancel?.gear?.name ||
+        "this equipment";
+
     return (
         <div className="rounded-3xl border border-slate-800 bg-slate-900/60 overflow-hidden backdrop-blur-xl shadow-2xl">
             <div className="overflow-x-auto">
@@ -243,7 +262,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
 
                                         {isPending && (
                                             <Button
-                                                onClick={() => handleCancelOrder(orderId)}
+                                                onClick={() => setOrderToCancel(order)}
                                                 disabled={isLoading}
                                                 variant="destructive"
                                                 size="sm"
@@ -260,6 +279,57 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                     </tbody>
                 </table>
             </div>
+
+            {/* Cancel Order Modal Confirmation */}
+            <Dialog open={!!orderToCancel} onOpenChange={(open) => !open && setOrderToCancel(null)}>
+                <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100 shadow-2xl rounded-2xl">
+                    <DialogHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2.5 rounded-xl border bg-rose-500/10 text-rose-400 border-rose-500/30">
+                                <AlertCircle className="h-5 w-5" />
+                            </div>
+                            <DialogTitle className="text-lg font-bold text-white">
+                                Cancel Rental Order
+                            </DialogTitle>
+                        </div>
+                        <DialogDescription className="text-slate-400 text-sm">
+                            Are you sure you want to cancel your rental request for{" "}
+                            <strong className="text-slate-200">{cancelGearName}</strong>?
+                            <br />
+                            This will update the order status to cancelled and free up the rental reservation.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter className="mt-4 gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setOrderToCancel(null)}
+                            disabled={loadingId === (orderToCancel?._id || orderToCancel?.id)}
+                            className="px-4 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors disabled:opacity-50"
+                        >
+                            Keep Order
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleConfirmCancel}
+                            disabled={loadingId === (orderToCancel?._id || orderToCancel?.id)}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-900/30 transition-all disabled:opacity-50"
+                        >
+                            {loadingId === (orderToCancel?._id || orderToCancel?.id) ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Cancelling...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <XCircle className="h-4 w-4" />
+                                    <span>Yes, Cancel Order</span>
+                                </>
+                            )}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

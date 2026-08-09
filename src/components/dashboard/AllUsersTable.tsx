@@ -37,7 +37,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
     } | null>(null);
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
-    // Confirmation Modal state
     const [confirmModal, setConfirmModal] = useState<{
         user: TUpdateUser;
         targetStatus: "ACTIVE" | "BLOCKED";
@@ -60,7 +59,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
     const triggerStatusConfirmation = (user: TUpdateUser, targetStatus: "ACTIVE" | "BLOCKED") => {
         setActiveDropdown(null);
 
-        // Check if admin tries to block himself
         const isSelf = Boolean(
             (currentUserId && user.id === currentUserId) ||
             (currentUserEmail && user.email === currentUserEmail)
@@ -83,7 +81,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
         setIsUpdating(userId);
         setConfirmModal(null);
 
-        // Optimistic update
         setStatusMap((prev) => ({ ...prev, [userId]: targetStatus }));
 
         try {
@@ -140,15 +137,15 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
 
                         const formattedDate = user.createdAt
                             ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                              })
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                            })
                             : "N/A";
 
                         return (
                             <TableRow key={userId} className="group hover:bg-slate-800/50 transition-colors">
-                                {/* Name & Avatar */}
+
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-800 border border-slate-700 text-teal-400 font-bold text-sm">
@@ -170,7 +167,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                                     </div>
                                 </TableCell>
 
-                                {/* Email */}
                                 <TableCell>
                                     <div className="flex items-center gap-2 text-slate-300">
                                         <Mail className="h-3.5 w-3.5 text-slate-500" />
@@ -178,41 +174,35 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                                     </div>
                                 </TableCell>
 
-                                {/* Role */}
                                 <TableCell>
                                     <span
-                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
-                                            user.role?.toUpperCase() === "ADMIN"
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${user.role?.toUpperCase() === "ADMIN"
                                                 ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
                                                 : user.role?.toUpperCase() === "PROVIDER"
-                                                ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                                                : "bg-teal-500/10 text-teal-400 border-teal-500/30"
-                                        }`}
+                                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                                                    : "bg-teal-500/10 text-teal-400 border-teal-500/30"
+                                            }`}
                                     >
                                         <Shield className="h-3 w-3" />
                                         {user.role || "CUSTOMER"}
                                     </span>
                                 </TableCell>
 
-                                {/* Status */}
                                 <TableCell>
                                     <span
-                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
-                                            isBlocked
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${isBlocked
                                                 ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                                 : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                        }`}
+                                            }`}
                                     >
                                         <span
-                                            className={`h-1.5 w-1.5 rounded-full ${
-                                                isBlocked ? "bg-rose-500" : "bg-emerald-500 animate-pulse"
-                                            }`}
+                                            className={`h-1.5 w-1.5 rounded-full ${isBlocked ? "bg-rose-500" : "bg-emerald-500 animate-pulse"
+                                                }`}
                                         />
                                         {currentStatus}
                                     </span>
                                 </TableCell>
 
-                                {/* Joined Date */}
                                 <TableCell>
                                     <div className="flex items-center gap-2 text-xs text-slate-400">
                                         <Calendar className="h-3.5 w-3.5 text-slate-500" />
@@ -220,7 +210,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                                     </div>
                                 </TableCell>
 
-                                {/* 3-Dot Action Button */}
                                 <TableCell className="text-right">
                                     <button
                                         onClick={(e) => handleDropdownClick(e, userId)}
@@ -237,7 +226,6 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                 </TableBody>
             </Table>
 
-            {/* 3-Dot Fixed Overlay Dropdown Menu (Outside Table Container) */}
             {activeDropdown && (
                 <>
                     <div
@@ -270,11 +258,10 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                                     <button
                                         onClick={() => triggerStatusConfirmation(user, "ACTIVE")}
                                         disabled={currentStatus === "ACTIVE"}
-                                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${
-                                            currentStatus === "ACTIVE"
+                                        className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${currentStatus === "ACTIVE"
                                                 ? "text-slate-600 cursor-not-allowed"
                                                 : "text-emerald-400 hover:bg-emerald-500/10"
-                                        }`}
+                                            }`}
                                     >
                                         <UserCheck className="h-4 w-4" />
                                         Set Active
@@ -284,11 +271,10 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                                         onClick={() => triggerStatusConfirmation(user, "BLOCKED")}
                                         disabled={currentStatus === "BLOCKED" || isSelf}
                                         title={isSelf ? "You cannot block your own account" : undefined}
-                                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${
-                                            currentStatus === "BLOCKED" || isSelf
+                                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-colors ${currentStatus === "BLOCKED" || isSelf
                                                 ? "text-slate-600 cursor-not-allowed opacity-60"
                                                 : "text-rose-400 hover:bg-rose-500/10"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center gap-2.5">
                                             <UserX className="h-4 w-4" />
@@ -303,17 +289,15 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                 </>
             )}
 
-            {/* Confirmation Dialog Modal */}
             <Dialog open={!!confirmModal} onOpenChange={(open) => !open && setConfirmModal(null)}>
                 <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
                     <DialogHeader>
                         <div className="flex items-center gap-3 mb-2">
                             <div
-                                className={`p-2.5 rounded-xl border ${
-                                    isTargetingBlock
+                                className={`p-2.5 rounded-xl border ${isTargetingBlock
                                         ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                         : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                }`}
+                                    }`}
                             >
                                 <AlertTriangle className="h-5 w-5" />
                             </div>
@@ -353,11 +337,10 @@ export default function AllUsersTable({ users, currentUserId, currentUserEmail }
                         <button
                             type="button"
                             onClick={handleConfirmStatusChange}
-                            className={`px-4 py-2 text-xs font-semibold rounded-xl text-white shadow-lg transition-all ${
-                                isTargetingBlock
+                            className={`px-4 py-2 text-xs font-semibold rounded-xl text-white shadow-lg transition-all ${isTargetingBlock
                                     ? "bg-rose-600 hover:bg-rose-500 shadow-rose-900/30"
                                     : "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/30"
-                            }`}
+                                }`}
                         >
                             {isTargetingBlock ? "Yes, Block User" : "Yes, Activate User"}
                         </button>
