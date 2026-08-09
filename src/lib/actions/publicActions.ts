@@ -63,6 +63,21 @@ export const getGearReviews = async (gearItemId: string) => {
             cache: "no-store",
         });
         const data = await res.json();
+
+        if (!data?.data || (Array.isArray(data?.data) && data.data.length === 0)) {
+            const fallbackRes = await fetch(`${baseUrl}/reviews/${gearItemId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                cache: "no-store",
+            });
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData?.data && Array.isArray(fallbackData.data) && fallbackData.data.length > 0) {
+                return fallbackData;
+            }
+        }
+
         return data;
     } catch (error) {
         console.error("Error fetching gear reviews:", error);

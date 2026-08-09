@@ -15,6 +15,7 @@ import {
     CreditCard,
     AlertCircle,
     Loader2,
+    Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import {
     DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog";
+import WriteReviewModal from "./WriteReviewModal";
 
 interface CustomerOrdersTableProps {
     initialOrders: TRentalOrder[];
@@ -34,6 +36,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
     const [orders, setOrders] = useState<TRentalOrder[]>(initialOrders);
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [orderToCancel, setOrderToCancel] = useState<TRentalOrder | null>(null);
+    const [reviewOrder, setReviewOrder] = useState<TRentalOrder | null>(null);
 
     const handleConfirmCancel = async () => {
         if (!orderToCancel) return;
@@ -218,6 +221,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                             const orderPrice = Number(order.totalPrice) || 0;
                             const isPending = order.rentalOrderStatus === "PENDING";
                             const isApproved = order.rentalOrderStatus === "APPROVED";
+                            const isReturned = order.rentalOrderStatus === "RETURNED";
                             const isLoading = loadingId === orderId;
 
                             return (
@@ -270,6 +274,17 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                                             >
                                                 <XCircle className="h-3.5 w-3.5 mr-1" />
                                                 Cancel
+                                            </Button>
+                                        )}
+
+                                        {isReturned && (
+                                            <Button
+                                                onClick={() => setReviewOrder(order)}
+                                                size="sm"
+                                                className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition-all hover:scale-105"
+                                            >
+                                                <Star className="h-3.5 w-3.5 mr-1 fill-amber-400" />
+                                                Write Review
                                             </Button>
                                         )}
                                     </td>
@@ -330,6 +345,17 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Write Review Modal */}
+            {reviewOrder && (
+                <WriteReviewModal
+                    isOpen={!!reviewOrder}
+                    onClose={() => setReviewOrder(null)}
+                    gearItemId={reviewOrder.gearItemId || reviewOrder.gearItem?._id || reviewOrder.gearItem?.id || reviewOrder.gear?._id || reviewOrder.gear?.id || ""}
+                    gearName={reviewOrder.gearItem?.name || reviewOrder.gear?.name || "Equipment"}
+                    gearBrand={reviewOrder.gearItem?.brand || reviewOrder.gear?.brand}
+                />
+            )}
         </div>
     );
 }
