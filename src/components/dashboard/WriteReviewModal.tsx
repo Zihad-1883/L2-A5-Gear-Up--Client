@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Star, MessageSquare, Loader2, Sparkles, X } from "lucide-react";
+import { Star, MessageSquare, Loader2, Sparkles } from "lucide-react";
 import { createReview } from "@/lib/actions/customerActions";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 interface WriteReviewModalProps {
     isOpen: boolean;
@@ -26,8 +34,6 @@ export default function WriteReviewModal({
     const [hoverRating, setHoverRating] = useState<number>(0);
     const [comment, setComment] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-    if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,84 +77,72 @@ export default function WriteReviewModal({
     const currentRating = hoverRating || rating;
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
-            <div className="w-full max-w-md max-h-[85vh] flex flex-col rounded-3xl border border-slate-800 bg-slate-900 text-slate-100 shadow-2xl relative overflow-hidden my-auto">
-                {/* Close Button Top Right */}
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="absolute right-4 top-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors z-20"
-                    aria-label="Close modal"
-                >
-                    <X className="h-5 w-5" />
-                </button>
-
-                {/* Modal Header */}
-                <div className="p-6 sm:p-7 pb-4 border-b border-slate-800/80 shrink-0 pr-12">
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100 shadow-2xl rounded-3xl p-6 sm:p-8">
+                <DialogHeader className="space-y-1.5 text-left">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500/10 text-teal-400 border border-teal-500/20 shrink-0">
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white tracking-tight">Write a Review</h2>
+                            <DialogTitle className="text-xl font-bold text-white tracking-tight">
+                                Write a Review
+                            </DialogTitle>
                             <p className="text-xs text-teal-400 font-semibold truncate max-w-[240px]">
                                 {gearName} {gearBrand ? `(${gearBrand})` : ""}
                             </p>
                         </div>
                     </div>
-                    <p className="text-xs text-slate-400 pt-2">
+                    <DialogDescription className="text-xs text-slate-400 pt-1">
                         Share your rental experience and equipment performance to help the community.
-                    </p>
-                </div>
+                    </DialogDescription>
+                </DialogHeader>
 
-                {/* Scrollable Form Body */}
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                    <div className="flex-1 overflow-y-auto p-6 sm:p-7 space-y-5">
-                        {/* Interactive Star Rating */}
-                        <div className="space-y-2 text-center bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
-                            <label className="text-xs font-extrabold uppercase text-slate-400 tracking-wider block">
-                                Rating: <span className="text-amber-400 lowercase font-bold">{ratingLabels[currentRating]}</span>
-                            </label>
-                            <div className="flex items-center justify-center gap-2 py-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        onClick={() => setRating(star)}
-                                        onMouseEnter={() => setHoverRating(star)}
-                                        onMouseLeave={() => setHoverRating(0)}
-                                        className="p-1 focus:outline-none transition-transform hover:scale-125 duration-150"
-                                    >
-                                        <Star
-                                            className={`h-7 w-7 transition-colors ${star <= currentRating
-                                                    ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                                                    : "text-slate-700 stroke-slate-700 hover:text-slate-500"
-                                                }`}
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Detailed Comment Box */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-extrabold uppercase text-slate-300 tracking-wider flex items-center gap-1.5">
-                                <MessageSquare className="h-3.5 w-3.5 text-teal-400" />
-                                Detailed Review / Feedback:
-                            </label>
-                            <textarea
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                rows={3}
-                                placeholder="How was the equipment condition, performance, and rental experience?"
-                                className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/50 resize-none"
-                                required
-                            />
+                <form onSubmit={handleSubmit} className="space-y-5 mt-2">
+                    {/* Interactive Star Rating */}
+                    <div className="space-y-2 text-center bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+                        <label className="text-xs font-extrabold uppercase text-slate-400 tracking-wider block">
+                            Rating: <span className="text-amber-400 lowercase font-bold">{ratingLabels[currentRating]}</span>
+                        </label>
+                        <div className="flex items-center justify-center gap-2 py-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setRating(star)}
+                                    onMouseEnter={() => setHoverRating(star)}
+                                    onMouseLeave={() => setHoverRating(0)}
+                                    className="p-1 focus:outline-none transition-transform hover:scale-125 duration-150"
+                                >
+                                    <Star
+                                        className={`h-7 w-7 transition-colors ${
+                                            star <= currentRating
+                                                ? "fill-amber-400 stroke-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                                                : "text-slate-700 stroke-slate-700 hover:text-slate-500"
+                                        }`}
+                                    />
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Fixed/Sticky Modal Footer Buttons */}
-                    <div className="p-4 sm:p-6 pt-3 border-t border-slate-800 bg-slate-900 shrink-0 flex items-center justify-end gap-3 z-10">
+                    {/* Detailed Comment Box */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-extrabold uppercase text-slate-300 tracking-wider flex items-center gap-1.5">
+                            <MessageSquare className="h-3.5 w-3.5 text-teal-400" />
+                            Detailed Review / Feedback:
+                        </label>
+                        <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            rows={3}
+                            placeholder="How was the equipment condition, performance, and rental experience?"
+                            className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500/50 resize-none"
+                            required
+                        />
+                    </div>
+
+                    <DialogFooter className="mt-4 gap-2 sm:gap-3">
                         <button
                             type="button"
                             onClick={onClose}
@@ -174,9 +168,9 @@ export default function WriteReviewModal({
                                 </>
                             )}
                         </button>
-                    </div>
+                    </DialogFooter>
                 </form>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }
