@@ -43,7 +43,10 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
         try {
             const saved = localStorage.getItem("gearup_reviewed_orders");
             if (saved) {
-                setReviewedOrderIds(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                queueMicrotask(() => {
+                    setReviewedOrderIds(parsed);
+                });
             }
         } catch (e) {
             console.error("Failed to parse reviewed orders from localStorage", e);
