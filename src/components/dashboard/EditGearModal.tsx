@@ -53,7 +53,13 @@ const getInitialFormState = (gear: TGear | null) => ({
     price: gear?.price !== undefined ? gear.price : ("" as string | number),
     stock: gear?.stock !== undefined ? gear.stock : ("" as string | number),
     description: gear?.description || "",
-    imageUrl: gear?.imageUrl || (gear?.images && gear.images[0]) || "",
+    imageUrl:
+        gear?.imageUrl ||
+        gear?.photoUrl ||
+        gear?.photo ||
+        gear?.image ||
+        (gear?.images && gear.images[0]) ||
+        "",
 });
 
 export default function EditGearModal({
@@ -106,8 +112,7 @@ export default function EditGearModal({
                 price: Number(editForm.price) || 0,
                 stock: Number(editForm.stock) || 0,
                 description: editForm.description.trim(),
-                imageUrl: photoUrl || undefined,
-                images: photoUrl ? [photoUrl] : undefined,
+                photoUrl: photoUrl || undefined,
             };
 
             const res = await updateGear(gearId, payload);

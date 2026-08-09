@@ -5,7 +5,6 @@ import { TUser } from "@/app/types/userAuthData.type";
 import {
     Users,
     Layers,
-    Wrench,
     Package,
     PlusCircle,
     PackageCheck,
@@ -45,6 +44,11 @@ export default function DashboardSidebar({ user }: { user: TUser | null }) {
             name: "Categories",
             path: "/dashboard/admin/categories",
             icon: Layers,
+        },
+        {
+            name: "All Gears",
+            path: "/dashboard/admin/all-gears",
+            icon: Package,
         },
         {
             name: "All Orders",

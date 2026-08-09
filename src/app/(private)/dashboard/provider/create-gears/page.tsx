@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createGears } from "@/lib/actions/providerActions";
 import { getAllCategories } from "@/lib/actions/publicActions";
@@ -57,6 +58,9 @@ export default function CreateGearsPage() {
 
         try {
             const photoUrl = data.imageUrl?.trim() || "";
+            const defaultPhoto = "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop";
+            const finalImage = photoUrl || defaultPhoto;
+
             const payload: TCreateGears = {
                 name: data.name.trim(),
                 brand: data.brand.trim(),
@@ -64,8 +68,7 @@ export default function CreateGearsPage() {
                 stock: Number(data.stock) || 1,
                 categoryId: data.categoryId,
                 description: data.description.trim(),
-                imageUrl: photoUrl || undefined,
-                images: photoUrl ? [photoUrl] : undefined,
+                photoUrl: finalImage,
             };
 
             const res = await createGears(payload);
@@ -103,7 +106,7 @@ export default function CreateGearsPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-md space-y-6 shadow-xl">
-                    {/* General Information */}
+
                     <div className="space-y-4">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <Tag className="h-4 w-4" />
@@ -160,7 +163,7 @@ export default function CreateGearsPage() {
                                     >
                                         <option value="">Select a Category</option>
                                         {categories.map((cat: TCategory) => {
-                                            const catId = cat.id;
+                                            const catId = cat._id || cat.id;
                                             return (
                                                 <option key={catId} value={catId}>
                                                     {cat.name}
@@ -176,7 +179,6 @@ export default function CreateGearsPage() {
                         </div>
                     </div>
 
-                    {/* Photo & Media Section */}
                     <div className="space-y-4 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <ImageIcon className="h-4 w-4" />
@@ -200,7 +202,6 @@ export default function CreateGearsPage() {
                                 </p>
                             </div>
 
-                            {/* Live Photo Preview Card */}
                             {watchImageUrl && watchImageUrl.trim() !== "" && (
                                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 space-y-2">
                                     <p className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
@@ -208,11 +209,13 @@ export default function CreateGearsPage() {
                                         Photo Preview:
                                     </p>
                                     <div className="relative h-48 w-full max-w-sm rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
+                                        <Image
                                             src={watchImageUrl.trim()}
                                             alt="Gear preview"
                                             className="h-full w-full object-cover"
+                                            width={500}
+                                            height={500}
+                                            unoptimized
                                             onError={(e) => {
                                                 (e.target as HTMLImageElement).src =
                                                     "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop";
@@ -224,7 +227,6 @@ export default function CreateGearsPage() {
                         </div>
                     </div>
 
-                    {/* Pricing & Inventory */}
                     <div className="space-y-4 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <DollarSign className="h-4 w-4" />
@@ -275,7 +277,6 @@ export default function CreateGearsPage() {
                         </div>
                     </div>
 
-                    {/* Details & Description */}
                     <div className="space-y-4 pt-2">
                         <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
                             <FileText className="h-4 w-4" />

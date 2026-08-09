@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSingleGear, getGearReviews } from "@/lib/actions/publicActions";
 import { TGear, TReview } from "@/app/types/gear";
@@ -14,15 +15,11 @@ import {
     Star,
     User,
     Calendar,
-    Tag,
 } from "lucide-react";
 
 interface GearDetailPageProps {
     params: Promise<{ id: string }>;
 }
-
-const DEFAULT_GEAR_IMAGE =
-    "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=800&auto=format&fit=crop";
 
 export default async function GearDetailPage({ params }: GearDetailPageProps) {
     const { id } = await params;
@@ -54,9 +51,12 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
             : null;
 
     const gearImage =
-        (gear.imageUrl && gear.imageUrl.trim()) ||
-        (gear.images && gear.images.length > 0 && gear.images[0].trim()) ||
-        DEFAULT_GEAR_IMAGE;
+        gear.imageUrl ||
+        gear.photoUrl ||
+        gear.photo ||
+        gear.image ||
+        (gear.images && gear.images[0]) ||
+        "";
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
@@ -74,15 +74,25 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
 
                 <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-10 backdrop-blur-xl space-y-8 shadow-2xl">
 
-                    {/* Gear Banner Image */}
-                    <div className="relative w-full h-64 sm:h-96 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src={gearImage}
-                            alt={gear.name}
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                    <div className="relative w-full h-64 sm:h-96 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner flex items-center justify-center">
+                        {gearImage ? (
+                            <>
+
+                                <Image
+                                    src={gearImage}
+                                    alt={gear.name}
+                                    className="w-full h-full object-cover"
+                                    width={1000}
+                                    height={1000}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center space-y-2 text-slate-500">
+                                <Boxes className="h-12 w-12 text-slate-600" />
+                                <span className="text-sm font-medium">No Image Available</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6">
@@ -94,11 +104,10 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                                 </div>
 
                                 <div
-                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${
-                                        isAvailable
-                                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                            : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                                    }`}
+                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${isAvailable
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                        }`}
                                 >
                                     <PackageCheck className="h-3.5 w-3.5" />
                                     <span>{isAvailable ? `${gear.stock} Available` : "Out of Stock"}</span>
@@ -219,11 +228,10 @@ export default async function GearDetailPage({ params }: GearDetailPageProps) {
                                                     {[1, 2, 3, 4, 5].map((star) => (
                                                         <Star
                                                             key={star}
-                                                            className={`h-3.5 w-3.5 ${
-                                                                star <= rating
-                                                                    ? "fill-amber-400 stroke-amber-400"
-                                                                    : "text-slate-700 stroke-slate-700"
-                                                            }`}
+                                                            className={`h-3.5 w-3.5 ${star <= rating
+                                                                ? "fill-amber-400 stroke-amber-400"
+                                                                : "text-slate-700 stroke-slate-700"
+                                                                }`}
                                                         />
                                                     ))}
                                                 </div>

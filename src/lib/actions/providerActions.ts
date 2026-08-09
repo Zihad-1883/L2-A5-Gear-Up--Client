@@ -22,6 +22,7 @@ export const createGears = async (data: TCreateGears) => {
             cache: "no-store",
         });
         const result = await res.json();
+        console.log("createGears response:", JSON.stringify(result, null, 2));
         revalidatePath("/dashboard/provider/create-gears");
         return result;
     } catch (error) {

@@ -6,6 +6,7 @@ export type TCreateGears = {
     stock: number;
     categoryId: string;
     imageUrl?: string;
+    photoUrl?: string;
     images?: string[];
 };
 
@@ -36,6 +37,9 @@ export interface TGear {
     categoryId?: string | { id?: string; _id?: string; name: string };
     category?: { id?: string; _id?: string; name: string };
     imageUrl?: string;
+    photoUrl?: string;
+    photo?: string;
+    image?: string;
     images?: string[];
     isAvailable?: boolean;
     reviews?: TReview[];
