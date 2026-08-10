@@ -46,7 +46,21 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
-
+    const paymentQuery = request.nextUrl.searchParams.get("payment");
+    if (paymentQuery) {
+        const targetUrl = new URL(request.url);
+        if (paymentQuery === "failed" || paymentQuery === "fail") {
+            targetUrl.pathname = "/payment/fail";
+        } else if (paymentQuery === "success") {
+            targetUrl.pathname = "/payment/success";
+        } else if (paymentQuery === "cancel" || paymentQuery === "cancelled") {
+            targetUrl.pathname = "/payment/cancel";
+        }
+        
+        if (targetUrl.pathname.startsWith("/payment/")) {
+            return NextResponse.redirect(targetUrl);
+        }
+    }
 
     const cookieStore = await cookies();
 
