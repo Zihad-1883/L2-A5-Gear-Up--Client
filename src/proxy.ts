@@ -46,28 +46,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const statusParam = (request.nextUrl.searchParams.get("status") || "").toUpperCase();
 
-    const hasPaymentParams =
-        request.nextUrl.searchParams.has("tran_id") ||
-        request.nextUrl.searchParams.has("val_id") ||
-        request.nextUrl.searchParams.has("transactionId") ||
-        request.nextUrl.searchParams.has("tranId") ||
-        request.nextUrl.searchParams.has("status") ||
-        (request.headers.get("referer") && request.headers.get("referer")!.includes("sslcommerz"));
-
-    if (hasPaymentParams) {
-        let targetPath = "/payment/success";
-        if (statusParam.includes("FAIL")) {
-            targetPath = "/payment/fail";
-        } else if (statusParam.includes("CANCEL")) {
-            targetPath = "/payment/cancel";
-        }
-
-        const targetUrl = new URL(targetPath, request.url);
-        request.nextUrl.searchParams.forEach((val, key) => targetUrl.searchParams.set(key, val));
-        return NextResponse.redirect(targetUrl);
-    }
 
     const cookieStore = await cookies();
 
