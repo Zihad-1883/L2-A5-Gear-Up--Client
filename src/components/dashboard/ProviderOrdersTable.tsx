@@ -134,7 +134,7 @@ export default function ProviderOrdersTable({ initialOrders }: ProviderOrdersTab
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/80">
-                        {orders.map((order, idx) => {
+                        {orders.map((order: TRentalOrder, idx: number) => {
                             const orderId = order._id || order.id || `ord-${idx}`;
                             const gearName =
                                 order.gearItem?.name ||

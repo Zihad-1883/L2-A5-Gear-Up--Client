@@ -23,7 +23,6 @@ function PaymentFailContent() {
 
     return (
         <div className="w-full max-w-lg rounded-3xl border border-rose-500/30 bg-slate-900/80 p-8 sm:p-10 text-center backdrop-blur-2xl shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
-
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-lg shadow-rose-500/20">
                 <XCircle className="h-10 w-10 stroke-[2.5]" />
             </div>
@@ -90,7 +89,6 @@ function PaymentFailContent() {
 export default function PaymentFailPage() {
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
-
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <Suspense

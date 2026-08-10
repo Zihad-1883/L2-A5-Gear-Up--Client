@@ -1,18 +1,74 @@
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { createNewAccessToken } from './utilis/accessToken';
 import { verifyToken } from './utilis/jwt';
 
 const AUTH_ROUTES = ["/login", "/register"];
-const PUBLIC_ROUTES = ["/", "/about", "/contact", "/gear", "/payment"];
+const PUBLIC_ROUTES = ["/", "/about", "/contact", "/gear", "/payment", "/payments"];
 const ADMIN_ROUTES = ["/dashboard/admin"];
 const CUSTOMER_ROUTES = ["/dashboard/customer"];
 const PROVIDER_ROUTES = ["/dashboard/provider"];
 
 export async function proxy(request: NextRequest) {
     const pathName = request.nextUrl.pathname;
+
+    if (
+        pathName.startsWith("/payment") ||
+        pathName.startsWith("/payments") ||
+        pathName.includes("/payment/")
+    ) {
+        if (request.method === "POST") {
+            try {
+                const redirectUrl = new URL(pathName, request.url);
+
+                request.nextUrl.searchParams.forEach((val, key) => redirectUrl.searchParams.set(key, val));
+
+                const contentType = request.headers.get("content-type") || "";
+                if (contentType.includes("form") || contentType.includes("json")) {
+                    const formData = await request.formData().catch(() => null);
+                    if (formData) {
+                        const tranId = formData.get("tran_id") || formData.get("transactionId") || formData.get("val_id") || formData.get("tranId");
+                        const amount = formData.get("amount") || formData.get("total_amount");
+                        const status = formData.get("status") || formData.get("status_code");
+                        if (tranId) redirectUrl.searchParams.set("tran_id", tranId.toString());
+                        if (amount) redirectUrl.searchParams.set("amount", amount.toString());
+                        if (status) redirectUrl.searchParams.set("status", status.toString());
+                    }
+                }
+
+                return NextResponse.redirect(redirectUrl, 303);
+            } catch {
+                return NextResponse.redirect(new URL(pathName, request.url), 303);
+            }
+        }
+        return NextResponse.next();
+    }
+
+    const statusParam = (request.nextUrl.searchParams.get("status") || "").toUpperCase();
+
+    const hasPaymentParams =
+        request.nextUrl.searchParams.has("tran_id") ||
+        request.nextUrl.searchParams.has("val_id") ||
+        request.nextUrl.searchParams.has("transactionId") ||
+        request.nextUrl.searchParams.has("tranId") ||
+        request.nextUrl.searchParams.has("status") ||
+        (request.headers.get("referer") && request.headers.get("referer")!.includes("sslcommerz"));
+
+    if (hasPaymentParams) {
+        let targetPath = "/payment/success";
+        if (statusParam.includes("FAIL")) {
+            targetPath = "/payment/fail";
+        } else if (statusParam.includes("CANCEL")) {
+            targetPath = "/payment/cancel";
+        }
+
+        const targetUrl = new URL(targetPath, request.url);
+        request.nextUrl.searchParams.forEach((val, key) => targetUrl.searchParams.set(key, val));
+        return NextResponse.redirect(targetUrl);
+    }
+
     const cookieStore = await cookies();
 
     let accessToken = cookieStore.get("accessToken")?.value;
@@ -28,16 +84,13 @@ export async function proxy(request: NextRequest) {
             cookieStore.set("accessToken", newAccessToken, {
                 httpOnly: true,
                 sameSite: "none",
+                secure: true,
                 maxAge: 60 * 60
             });
 
             accessToken = newAccessToken;
             verifiedAccessToken = verifyToken(accessToken, process.env.JWT_ACCESS_SECRET);
         }
-    }
-
-    if (accessToken && verifiedAccessToken && !verifiedAccessToken.success) {
-        cookieStore.delete("accessToken");
     }
 
     let userRole: string | null = null;

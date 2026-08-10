@@ -117,9 +117,16 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
             const res = await createPaymentSession(orderId);
             console.log("Payment session response:", res);
 
-            const targetUrl = findUrlInObject(res);
+            const targetUrl =
+                res?.data?.paymentUrl ||
+                res?.data?.gatewayUrl ||
+                res?.data?.url ||
+                res?.data?.GatewayPageURL ||
+                res?.paymentUrl ||
+                res?.url ||
+                findUrlInObject(res);
 
-            if (res?.success && targetUrl) {
+            if ((res?.success || res?.statusCode === 200) && targetUrl) {
                 toast.success("Redirecting to SSLCommerz payment gateway...");
                 window.location.assign(targetUrl);
             } else {
@@ -220,7 +227,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/80">
-                        {orders.map((order, idx) => {
+                        {orders.map((order: TRentalOrder, idx: number) => {
                             const orderId = order._id || order.id || `ord-${idx}`;
                             const gearItemId = order.gearItemId || order.gearItem?._id || order.gearItem?.id || order.gear?._id || order.gear?.id || "";
                             const gearName =
@@ -250,6 +257,7 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                             const isPending = order.rentalOrderStatus === "PENDING";
                             const isApproved = order.rentalOrderStatus === "APPROVED";
                             const isReturned = order.rentalOrderStatus === "RETURNED";
+                            const isPaid = order.paymentStatus?.toUpperCase() === "PAID";
                             const isLoading = loadingId === orderId;
 
                             const isAlreadyReviewed =
@@ -280,12 +288,20 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                                         ${orderPrice.toFixed(2)}
                                     </td>
 
-                                    <td className="py-4 px-6">
-                                        {getStatusBadge(order.rentalOrderStatus)}
+                                    <td className="py-4 px-6 space-y-1">
+                                        <div>{getStatusBadge(order.rentalOrderStatus)}</div>
+                                        {isPaid && (
+                                            <div>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                    <CheckCircle2 className="h-3 w-3" />
+                                                    Payment Received
+                                                </span>
+                                            </div>
+                                        )}
                                     </td>
 
                                     <td className="py-4 px-6 text-right space-x-2">
-                                        {isApproved && (
+                                        {isApproved && !isPaid && (
                                             <Button
                                                 onClick={() => handlePayNow(orderId)}
                                                 disabled={isLoading}
@@ -295,6 +311,13 @@ export default function CustomerOrdersTable({ initialOrders }: CustomerOrdersTab
                                                 <CreditCard className="h-3.5 w-3.5 mr-1" />
                                                 Pay Now
                                             </Button>
+                                        )}
+
+                                        {isApproved && isPaid && (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                Paid
+                                            </span>
                                         )}
 
                                         {isPending && (

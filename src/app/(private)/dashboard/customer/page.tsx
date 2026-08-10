@@ -36,16 +36,16 @@ const CustomerDashboardPage = async () => {
 
     const totalOrders = orders.length;
     const pendingOrders = orders.filter(
-        (o) => (o.rentalOrderStatus || "PENDING").toUpperCase() === "PENDING"
+        (o: TRentalOrder) => (o.rentalOrderStatus || "PENDING").toUpperCase() === "PENDING"
     ).length;
     const approvedOrders = orders.filter(
-        (o) => (o.rentalOrderStatus || "").toUpperCase() === "APPROVED"
+        (o: TRentalOrder) => (o.rentalOrderStatus || "").toUpperCase() === "APPROVED"
     ).length;
     const activeRentals = orders.filter(
-        (o) => (o.rentalOrderStatus || "").toUpperCase() === "PICKED_UP"
+        (o: TRentalOrder) => (o.rentalOrderStatus || "").toUpperCase() === "PICKED_UP"
     ).length;
     const completedRentals = orders.filter(
-        (o) => (o.rentalOrderStatus || "").toUpperCase() === "RETURNED"
+        (o: TRentalOrder) => (o.rentalOrderStatus || "").toUpperCase() === "RETURNED"
     ).length;
 
     const recentOrders = orders.slice(0, 5);
@@ -284,7 +284,7 @@ const CustomerDashboardPage = async () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60">
-                                {recentOrders.map((order, idx) => {
+                                {recentOrders.map((order: TRentalOrder, idx: number) => {
                                     const gearName = order.gearItem?.name || order.gear?.name || "Rental Equipment";
                                     const gearBrand = order.gearItem?.brand || order.gear?.brand || "";
                                     const price = Number(order.totalPrice) || 0;

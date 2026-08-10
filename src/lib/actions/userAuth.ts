@@ -43,13 +43,15 @@ export const loginUser = async (data: TLoginUser) => {
             cookieStore.set("accessToken", result.data.accessToken, {
                 path: "/",
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: "none",
+                secure: true,
             });
             if (result?.data?.refreshToken) {
                 cookieStore.set("refreshToken", result.data.refreshToken, {
                     path: "/",
                     httpOnly: true,
-                    sameSite: "lax",
+                    sameSite: "none",
+                    secure: true,
                 });
             }
         }
@@ -65,4 +67,4 @@ export const logoutUser = async () => {
     const cookieStore = await cookies();
     cookieStore.delete("accessToken");
     cookieStore.delete("refreshToken");
-};
+};
