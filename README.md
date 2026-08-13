@@ -6,9 +6,9 @@
 
 ## 🔗 Repositories & API Links
 
-- 🖥️ **Frontend Repository**: `https://github.com/Zihad-1883/L2-A5-Gear-Up--Client`
+- 🖥️ **Frontend Repository**: [https://github.com/Zihad-1883/L2-A5-Gear-Up--Client](https://github.com/Zihad-1883/L2-A5-Gear-Up--Client)
 - ⚙️ **Backend Server Repository**: [https://github.com/Zihad-1883/L2-A4-Gear-Up--Server](https://github.com/Zihad-1883/L2-A4-Gear-Up--Server)
-- 🌐 **Live API Base URL**: `https://gearup-backend-4eca.onrender.com/api`
+- 🌐 **Live API Base URL**: [https://gearup-backend-4eca.onrender.com/api](https://gearup-backend-4eca.onrender.com/api)
 
 ---
 
